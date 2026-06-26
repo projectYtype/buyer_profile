@@ -175,7 +175,7 @@
                 </div>
             </div>
             <div class="flex gap-1.5 sm:gap-3 items-center">
-                <button onclick="openScheduleLoginModal()" class="text-[10px] font-black text-white energy-gradient hover:opacity-90 transition-colors flex items-center gap-1.5 px-3 py-1.5 rounded-full shadow-md whitespace-nowrap">
+                <button id="directScheduleBtn" onclick="handleDirectScheduleView()" class="text-[10px] font-black text-white energy-gradient hover:opacity-90 transition-colors flex items-center gap-1.5 px-3 py-1.5 rounded-full shadow-md whitespace-nowrap">
     <i class="fa-regular fa-calendar-check"></i> <span class="hidden sm:inline">나의</span> 일정표 확인<span class="hidden sm:inline">하기</span>
 </button>
                 <button onclick="openCheckModal()" class="text-[10px] font-black text-slate-600 hover:text-brand-600 hover:bg-brand-50 transition-colors flex items-center gap-1.5 border-2 border-slate-100 hover:border-brand-200 px-3 py-1.5 rounded-full bg-white whitespace-nowrap">
@@ -875,7 +875,7 @@ function generateAndOpenSchedule(eventData, company) {
 
     const buyerMap = buyers.reduce((acc, b) => { acc[b.id] = b; return acc; }, {});
 
-    // 행사 시간 슬롯 계산 (운영 코드와 동일 로직)
+    // 행사 시간 슬롯 계산
     const parseTime = (str) => { const [h, m] = (str||"00:00").split(':').map(Number); return h * 60 + m; };
     const formatTime = (mins) => `${String(Math.floor(mins / 60)).padStart(2, '0')}:${String(mins % 60).padStart(2, '0')}`;
     let timeSlots = [];
@@ -891,10 +891,10 @@ function generateAndOpenSchedule(eventData, company) {
         curr = end;
     }
 
-    // HTML 테이블 바디 생성
+    // HTML 테이블 바디 생성 (디자인 개선)
     let tbodyHTML = '';
     (config.dates||[]).forEach((dateStr, dayIdx) => {
-        tbodyHTML += `<tr class="day-header"><td colspan="4">${dayIdx + 1}일 차 (${dateStr})</td></tr>`;
+        tbodyHTML += `<tr class="day-header"><td colspan="4">📅 ${dayIdx + 1}일 차 (${dateStr})</td></tr>`;
         
         let lastEndTime = null;
         timeSlots.forEach(slot => {
@@ -908,42 +908,97 @@ function generateAndOpenSchedule(eventData, company) {
             const buyer = buyerMap[bId];
             const tableNum = buyer ? (tableAllocations[dayIdx]?.[slot.value]?.[bId] || buyer.tableNo || '-') : '-';
             const isBooked = !!buyer;
-            const mainText = buyer ? `${buyer.company} (${buyer.name})` : '일정 없음';
-            const subText = buyer ? tableNum : '-';
+            
+            // 데이터 태그 렌더링
+            const mainText = buyer ? `<span class="highlight">${buyer.company}</span> <span style="font-size:13px; color:#64748b; font-weight:500;">(${buyer.name})</span>` : '일정 없음';
+            const subText = buyer ? `<span class="badge active">T ${tableNum}</span>` : `<span class="badge">-</span>`;
 
-            tbodyHTML += `<tr><td>${dateStr}</td><td>${slot.value}</td><td class="${isBooked ? 'highlight' : 'dimmed'}">${mainText}</td><td>${subText}</td></tr>`;
+            tbodyHTML += `
+            <tr class="${isBooked ? '' : 'dimmed-row'}">
+                <td style="font-weight:700; color:#475569;">${dateStr}</td>
+                <td style="font-weight:900; color:#059669;">${slot.value}</td>
+                <td class="${isBooked ? '' : 'dimmed'}">${mainText}</td>
+                <td>${subText}</td>
+            </tr>`;
         });
     });
 
-    // 새 창에 그리기 (운영.txt의 프린트 뷰 CSS)
     const title = `[기업] ${company.name} 매칭 스케줄`;
-    const theadHTML = `<tr><th>날짜</th><th>시간</th><th>매칭 바이어 소속 및 이름</th><th>테이블 번호</th></tr>`;
+    const theadHTML = `<tr><th width="18%">날짜</th><th width="18%">시간</th><th width="48%">매칭 바이어 소속 및 이름</th><th width="16%">테이블</th></tr>`;
 
+    // 🌟 완전 개편된 CSS 적용 HTML
     const htmlContent = `
+        <!DOCTYPE html>
         <html lang="ko">
         <head>
             <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>${title}</title>
             <style>
-                body{font-family:'Malgun Gothic','맑은 고딕',sans-serif;padding:20px;color:#000;}
-                h2{color:#000;border-bottom:2px solid #000;padding-bottom:10px;}
-                table{width:100%;border-collapse:collapse;margin-top:15px;text-align:center;font-size:12px;}
-                th,td{border:1px solid #444;padding:10px 8px;}
-                th{background-color:#f0f0f0;font-weight:bold;border-bottom:2px solid #000;}
-                .day-header td{background-color:#e8e8e8 !important;font-weight:bold;text-align:left;padding-left:15px;border-top:2px solid #000;}
-                .lunch-row td{background-color:#fafafa !important;color:#555;font-weight:bold;font-style:italic;border-top:1px dashed #888;border-bottom:1px dashed #888;}
-                .highlight{font-weight:bold;}
-                .dimmed{color:#aaa;}
-                @media print{ button{display:none;} body{padding:0;} }
+                @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap');
+                body { font-family: 'Noto Sans KR', sans-serif; padding: 40px 20px; color: #1e293b; background-color: #f8fafc; margin: 0; }
+                .container { max-width: 900px; margin: 0 auto; background: #fff; padding: 50px; border-radius: 32px; box-shadow: 0 20px 40px -10px rgba(0,0,0,0.05), 0 0 10px rgba(0,0,0,0.01); }
+                .header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 4px solid #059669; padding-bottom: 24px; margin-bottom: 30px; }
+                h2 { color: #0f172a; font-size: 32px; font-weight: 900; margin: 0; letter-spacing: -1.5px; line-height: 1.2; }
+                h2 span { color: #059669; }
+                .subtitle { display: block; font-size: 14px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; }
+                .btn-print { background: linear-gradient(135deg, #059669 0%, #0d9488 100%); color: white; border: none; padding: 14px 28px; border-radius: 14px; font-weight: 800; font-size: 15px; cursor: pointer; box-shadow: 0 10px 15px -3px rgba(5, 150, 105, 0.2); transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); display: flex; align-items: center; gap: 8px; outline: none; }
+                .btn-print:hover { transform: translateY(-3px); box-shadow: 0 15px 20px -5px rgba(5, 150, 105, 0.3); }
+                .btn-print:active { transform: translateY(0); }
+                table { width: 100%; border-collapse: separate; border-spacing: 0; text-align: center; font-size: 15px; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; }
+                th, td { border-bottom: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; padding: 18px 12px; }
+                th:last-child, td:last-child { border-right: none; }
+                tr:last-child td { border-bottom: none; }
+                thead tr { background-color: #f8fafc; color: #475569; }
+                th { font-weight: 900; font-size: 15px; letter-spacing: -0.5px; }
+                tbody tr { transition: background-color 0.1s; }
+                tbody tr:hover { background-color: #f1f5f9; }
+                .day-header td { background-color: #ecfdf5 !important; color: #064e3b; font-weight: 900; text-align: left; padding-left: 28px; font-size: 16px; border-top: 3px solid #34d399; letter-spacing: -0.5px; }
+                .lunch-row td { background-color: #fff7ed !important; color: #ea580c; font-weight: 800; border-top: 1px dashed #fdba74; border-bottom: 1px dashed #fdba74; font-size: 14px; }
+                .highlight { font-weight: 900; color: #0f172a; font-size: 16px; letter-spacing: -0.5px; }
+                .dimmed { color: #cbd5e1; font-weight: 600; }
+                .dimmed-row { background-color: #fafafa; }
+                .badge { display: inline-block; background: #f1f5f9; color: #94a3b8; padding: 6px 14px; border-radius: 10px; font-weight: 800; font-size: 14px; min-width: 30px; }
+                .badge.active { background: #059669; color: white; box-shadow: 0 4px 6px -1px rgba(5, 150, 105, 0.2); }
+                
+                /* 프린트 시 깔끔하게 나오도록 최적화 */
+                @media print {
+                    body { padding: 0; background: #fff; }
+                    .container { box-shadow: none; padding: 0; max-width: 100%; border-radius: 0; }
+                    .header { border-bottom: 3px solid #000; padding-bottom: 15px; margin-bottom: 20px; }
+                    h2 { color: #000; font-size: 24px; }
+                    h2 span { color: #000; }
+                    .subtitle { color: #000; margin-bottom: 4px; }
+                    .btn-print { display: none; }
+                    table { border: 2px solid #000; border-radius: 0; }
+                    th, td { border-color: #444; padding: 12px 8px; }
+                    th { background-color: #f0f0f0 !important; -webkit-print-color-adjust: exact; color: #000; border-bottom: 2px solid #000; }
+                    .day-header td { background-color: #e8e8e8 !important; color: #000; border-top: 2px solid #000; padding-left: 15px; }
+                    .lunch-row td { color: #555; background-color: #fafafa !important; -webkit-print-color-adjust: exact; border-style: dashed; }
+                    .highlight { color: #000; }
+                    .badge { border: 1px solid #ddd; background: transparent; color: #666; box-shadow: none; padding: 4px 8px; }
+                    .badge.active { border: 2px solid #000; color: #000; font-weight: 900; }
+                    .dimmed-row { background-color: transparent; }
+                }
             </style>
         </head>
         <body>
-            <h2>${title}</h2>
-            <button onclick="window.print()" style="padding:10px 20px;margin-bottom:15px;cursor:pointer;background:#059669;color:white;border:none;border-radius:6px;font-weight:bold;">🖨️ 인쇄하기 / PDF 저장</button>
-            <table>
-                <thead>${theadHTML}</thead>
-                <tbody>${tbodyHTML}</tbody>
-            </table>
+            <div class="container">
+                <div class="header">
+                    <div>
+                        <span class="subtitle">NEO 2026 B2B Matching Schedule</span>
+                        <h2><span>${company.name}</span> 매칭 스케줄</h2>
+                    </div>
+                    <button class="btn-print" onclick="window.print()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                        인쇄 / PDF 저장
+                    </button>
+                </div>
+                <table>
+                    <thead>${theadHTML}</thead>
+                    <tbody>${tbodyHTML}</tbody>
+                </table>
+            </div>
         </body>
         </html>
     `;
@@ -952,32 +1007,6 @@ function generateAndOpenSchedule(eventData, company) {
     if (!printWindow) return alert('브라우저의 팝업 차단을 해제해주세요.');
     printWindow.document.write(htmlContent);
     printWindow.document.close();
-}
-    </script>
-<div id="scheduleLoginModal" class="fixed inset-0 z-[200] hidden bg-slate-900/90 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white rounded-[2rem] p-8 max-w-sm w-full shadow-2xl relative animate-in zoom-in-95 duration-300">
-        <button onclick="closeScheduleLoginModal()" class="absolute top-6 right-6 text-slate-400 hover:text-slate-900 transition-colors">
-            <i class="fa-solid fa-xmark text-xl"></i>
-        </button>
-        <div class="text-center mb-8">
-            <div class="bg-brand-500 text-white w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-4 text-xl shadow-lg shadow-brand-500/30">
-                <i class="fa-regular fa-calendar-check"></i>
-            </div>
-            <h2 class="text-2xl font-black tracking-tighter text-slate-900">나의 일정표 조회</h2>
-            <p class="text-xs font-bold text-slate-400 mt-2">기업명과 담당자 정보를 입력해주세요.</p>
-        </div>
-        <div class="space-y-4">
-            <div>
-                <label class="text-[10px] font-black text-slate-400 uppercase ml-1">아이디 (기업명)</label>
-                <input type="text" id="schedLoginCompany" placeholder="예: 성창 주식회사" class="w-full px-5 py-4 rounded-xl border-2 border-slate-100 focus:border-brand-500 outline-none font-bold text-sm transition-colors mt-1">
-            </div>
-            <div>
-                <label class="text-[10px] font-black text-slate-400 uppercase ml-1">비밀번호 (담당자명 직급)</label>
-                <input type="text" id="schedLoginManager" placeholder="예: 홍길동 과장" class="w-full px-5 py-4 rounded-xl border-2 border-slate-100 focus:border-brand-500 outline-none font-bold text-sm transition-colors mt-1" onkeypress="if(event.key === 'Enter') handleScheduleLogin()">
-            </div>
-            <button type="button" id="schedLoginBtn" onclick="handleScheduleLogin()" class="w-full energy-gradient text-white py-4 rounded-xl font-black text-lg hover:opacity-90 shadow-lg shadow-brand-500/30 transition-all mt-2">일정표 확인</button>
-        </div>
-    </div>
-</div>
+}    </script>
 </body>
 </html>
