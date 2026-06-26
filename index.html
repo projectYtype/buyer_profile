@@ -797,32 +797,15 @@
 // 운영 포털 마스터 DB 접근 주소
 const MASTER_GAS_URL = 'https://script.google.com/macros/s/AKfycbxO3gHGZbsBmjaX-hfFHP-s7trR6OEKj_Rw-3G5-B0ehMOC3JTl1h2r7rEF8M3XmsqO/exec';
 
-function openScheduleLoginModal() {
-    // 바이어 프로파일에 이미 로그인 되어 있다면 자동으로 채워주는 편의 기능 추가
-    if(loggedInCompany && loggedInCompany !== '관리자') {
-        document.getElementById('schedLoginCompany').value = loggedInCompany;
+async function handleDirectScheduleView() {
+    // 처음에 로그인한 세션 정보(loggedInCompany)를 그대로 활용
+    if (!loggedInCompany || loggedInCompany === '관리자') {
+        return showToast('기업 로그인 상태에서만 일정표를 확인할 수 있습니다.', 'error');
     }
-    if(loggedInManager && loggedInManager !== '운영팀') {
-        document.getElementById('schedLoginManager').value = loggedInManager;
-    }
-    document.getElementById('scheduleLoginModal').classList.remove('hidden');
-    document.body.classList.add('modal-open');
-}
 
-function closeScheduleLoginModal() {
-    document.getElementById('scheduleLoginModal').classList.add('hidden');
-    document.body.classList.remove('modal-open');
-}
-
-async function handleScheduleLogin() {
-    const companyInput = document.getElementById('schedLoginCompany').value.trim().toLowerCase();
-    const managerInput = document.getElementById('schedLoginManager').value.trim();
-
-    if (!companyInput) return showToast('기업명을 입력해주세요.', 'error');
-    if (!managerInput) return showToast('담당자 성함 및 직급을 입력해주세요.', 'error');
-
-    const btn = document.getElementById('schedLoginBtn');
-    btn.innerHTML = '<i class="fa-solid fa-spinner spinner"></i> 일정 불러오는 중...';
+    const btn = document.getElementById('directScheduleBtn');
+    const originalText = btn.innerHTML; // 원래 버튼 텍스트 백업
+    btn.innerHTML = '<i class="fa-solid fa-spinner spinner"></i> 불러오는 중...';
     btn.disabled = true;
 
     try {
@@ -833,12 +816,14 @@ async function handleScheduleLogin() {
         let targetCompany = null;
         let targetEvent = null;
 
-        // 기업명 부분 일치 검색 (완전히 똑같지 않아도 됨)
+        // 로그인된 기업명(loggedInCompany)으로 바로 매칭
+        const searchName = loggedInCompany.toLowerCase();
+        
         for (const evtId in events) {
             if(events[evtId].eventName === '__accounts') continue;
             const event = events[evtId];
             const comps = event.companies || [];
-            const found = comps.find(c => c.name.toLowerCase().includes(companyInput));
+            const found = comps.find(c => c.name.toLowerCase().includes(searchName));
             
             if (found) {
                 targetCompany = found;
@@ -848,25 +833,20 @@ async function handleScheduleLogin() {
         }
 
         if (!targetCompany) {
-            showToast('해당 기업명으로 배정된 스케줄을 찾을 수 없습니다.', 'error');
-            btn.innerHTML = '일정표 확인';
-            btn.disabled = false;
-            return;
+            showToast('현재 배정된 미팅 스케줄이 없습니다.', 'error');
+        } else {
+            // 스케줄 새 창 생성 (예쁜 디자인 함수 호출)
+            generateAndOpenSchedule(targetEvent, targetCompany);
         }
-
-        // 스케줄 새 창 생성
-        generateAndOpenSchedule(targetEvent, targetCompany);
-        closeScheduleLoginModal();
 
     } catch (err) {
         console.error(err);
         showToast('서버 연결 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.', 'error');
     } finally {
-        btn.innerHTML = '일정표 확인';
+        btn.innerHTML = originalText; // 로딩 끝나면 버튼 원상복구
         btn.disabled = false;
     }
 }
-
 function generateAndOpenSchedule(eventData, company) {
     const config = eventData.config || {};
     const matches = eventData.matches || {};
