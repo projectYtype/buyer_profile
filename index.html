@@ -37,207 +37,205 @@
 </head>
 <body class="bg-slate-50 text-slate-900 leading-relaxed relative">
 
-    <!-- 로그인 모달 -->
     <div id="loginModal" class="fixed inset-0 z-[200] bg-slate-900 flex items-center justify-center p-4">
         <div class="absolute inset-0 opacity-20 pointer-events-none">
             <img src="https://images.unsplash.com/photo-1508514177221-188b1cf16e9d?auto=format&fit=crop&w=1200&q=80" alt="bg" class="w-full h-full object-cover">
         </div>
-        <div class="bg-white rounded-[2rem] p-8 max-w-sm w-full shadow-2xl relative overflow-hidden z-10 animate-in zoom-in-95 duration-500">
-            <div class="text-center mb-8">
+        <div class="bg-white rounded-3xl sm:rounded-[2rem] p-6 sm:p-8 max-w-sm w-full shadow-2xl relative overflow-hidden z-10 animate-in zoom-in-95 duration-500">
+            <div class="text-center mb-6 sm:mb-8">
                 <div class="bg-brand-500 text-white w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-4 text-xl shadow-lg shadow-brand-500/30">
                     <i class="fa-solid fa-leaf"></i>
                 </div>
-                <h2 class="text-2xl font-black tracking-tighter text-slate-900">NEO 2026 B2B</h2>
-                <p class="text-xs font-bold text-slate-400 mt-2">안전한 매칭을 위한 파트너 로그인</p>
+                <h2 class="text-xl sm:text-2xl font-black tracking-tighter text-slate-900">NEO 2026 B2B</h2>
+                <p class="text-[10px] sm:text-xs font-bold text-slate-400 mt-2">안전한 매칭을 위한 파트너 로그인</p>
             </div>
 
-            <!-- Step 1: 사업자 번호 입력 -->
-            <div id="loginStep1" class="space-y-5">
+            <div id="loginStep1" class="space-y-4 sm:space-y-5">
                 <div>
                     <label class="text-[10px] font-black text-slate-400 uppercase ml-1">사업자 등록번호 뒷 5자리</label>
-                    <input type="text" id="loginBizNum" maxlength="5" placeholder="예: 12345" class="w-full px-5 py-4 rounded-xl border-2 border-slate-100 focus:border-brand-500 outline-none font-black text-xl text-center tracking-[0.5em] transition-colors mt-1" onkeypress="if(event.key === 'Enter') handleLoginStep1()">
+                    <input type="text" id="loginBizNum" maxlength="5" placeholder="예: 12345" class="w-full px-4 sm:px-5 py-3 sm:py-4 rounded-xl border-2 border-slate-100 focus:border-brand-500 outline-none font-black text-lg sm:text-xl text-center tracking-[0.3em] sm:tracking-[0.5em] transition-colors mt-1" onkeypress="if(event.key === 'Enter') handleLoginStep1()">
                 </div>
-                <button type="button" onclick="handleLoginStep1()" class="w-full energy-gradient text-white py-4 rounded-xl font-black text-lg hover:opacity-90 shadow-lg shadow-brand-500/30 transition-all">다음 단계</button>
+                <button type="button" onclick="handleLoginStep1()" class="w-full energy-gradient text-white py-3 sm:py-4 rounded-xl font-black text-base sm:text-lg hover:opacity-90 shadow-lg shadow-brand-500/30 transition-all">다음 단계</button>
             </div>
 
-            <!-- Step 2: 중복 기업 선택 (숨김) -->
             <div id="loginStep2" class="space-y-4 hidden animate-in slide-in-from-right-4">
-                <p class="text-xs font-bold text-brand-600 mb-2 text-center bg-brand-50 p-2 rounded-lg">해당 번호의 기업이 여러 개 확인되었습니다.<br>소속 기업을 선택해주세요.</p>
+                <p class="text-[10px] sm:text-xs font-bold text-brand-600 mb-2 text-center bg-brand-50 p-2 rounded-lg">해당 번호의 기업이 여러 개 확인되었습니다.<br>소속 기업을 선택해주세요.</p>
                 <div id="duplicateCompanyList" class="space-y-2 max-h-48 overflow-y-auto no-scrollbar">
                 </div>
                 <button type="button" onclick="backToStep1()" class="w-full bg-slate-100 text-slate-500 py-3 rounded-xl font-bold text-sm hover:bg-slate-200 transition-all mt-2">뒤로 가기</button>
             </div>
 
-            <!-- Step 3: 담당자명 입력 (숨김) -->
-            <div id="loginStep3" class="space-y-5 hidden animate-in slide-in-from-right-4">
+            <div id="loginStep3" class="space-y-4 sm:space-y-5 hidden animate-in slide-in-from-right-4">
                 <div class="bg-brand-50 p-4 rounded-xl text-center border border-brand-100">
                     <p class="text-[10px] font-black text-brand-600 uppercase mb-1">인증된 기업명</p>
-                    <p id="confirmCompanyName" class="font-black text-slate-800 text-lg"></p>
+                    <p id="confirmCompanyName" class="font-black text-slate-800 text-base sm:text-lg"></p>
                 </div>
                 <div>
                     <label class="text-[10px] font-black text-slate-400 uppercase ml-1">담당자 성함 및 직급</label>
-                    <input type="text" id="loginManager" placeholder="예: 홍길동 과장" class="w-full px-5 py-4 rounded-xl border-2 border-slate-100 focus:border-brand-500 outline-none font-bold text-base transition-colors mt-1" onkeypress="if(event.key === 'Enter') handleLoginFinal()">
+                    <input type="text" id="loginManager" placeholder="예: 홍길동 과장" class="w-full px-4 sm:px-5 py-3 sm:py-4 rounded-xl border-2 border-slate-100 focus:border-brand-500 outline-none font-bold text-sm sm:text-base transition-colors mt-1" onkeypress="if(event.key === 'Enter') handleLoginFinal()">
                 </div>
-                <button type="button" onclick="handleLoginFinal()" class="w-full bg-slate-900 text-white py-4 rounded-xl font-black text-lg hover:bg-black shadow-xl transition-all">시스템 접속하기</button>
-                <button type="button" onclick="backToStep1()" class="w-full bg-transparent text-slate-400 py-2 rounded-xl font-bold text-xs hover:text-slate-600 transition-all underline underline-offset-2">처음부터 다시하기</button>
+                <button type="button" onclick="handleLoginFinal()" class="w-full bg-slate-900 text-white py-3 sm:py-4 rounded-xl font-black text-base sm:text-lg hover:bg-black shadow-xl transition-all">시스템 접속하기</button>
+                <button type="button" onclick="backToStep1()" class="w-full bg-transparent text-slate-400 py-2 rounded-xl font-bold text-[10px] sm:text-xs hover:text-slate-600 transition-all underline underline-offset-2">처음부터 다시하기</button>
             </div>
         </div>
     </div>
 
-    <!-- 내역 확인 모달 -->
-    <div id="checkModal" class="fixed inset-0 z-[100] hidden flex items-start justify-center p-4 pt-20">
+    <div id="checkModal" class="fixed inset-0 z-[100] hidden flex items-start justify-center p-4 pt-16 sm:pt-20">
         <div class="absolute inset-0 bg-slate-950/90 backdrop-blur-md" onclick="closeCheckModal()"></div>
-        <div class="relative bg-white w-full max-w-lg rounded-[3rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 border border-brand-500/20">
-            <div class="bg-slate-900 p-8 text-white flex justify-between items-center">
-                <h3 class="text-xl font-black tracking-tighter flex items-center gap-2"><i class="fa-solid fa-bolt text-brand-500"></i> 나의 신청 내역</h3>
-                <button onclick="closeCheckModal()" class="opacity-50 hover:opacity-100 transition-opacity"><i class="fa-solid fa-xmark text-xl"></i></button>
+        <div class="relative bg-white w-full max-w-lg rounded-3xl sm:rounded-[3rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 border border-brand-500/20 max-h-[85vh] flex flex-col">
+            <div class="bg-slate-900 p-6 sm:p-8 text-white flex justify-between items-center shrink-0">
+                <h3 class="text-lg sm:text-xl font-black tracking-tighter flex items-center gap-2"><i class="fa-solid fa-bolt text-brand-500"></i> 나의 신청 내역</h3>
+                <button onclick="closeCheckModal()" class="opacity-50 hover:opacity-100 transition-opacity p-2 -mr-2"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
-            <div class="p-8">
-                <div class="bg-brand-50 p-5 rounded-2xl mb-6 border border-brand-100 flex justify-between items-center">
+            <div class="p-6 sm:p-8 overflow-y-auto no-scrollbar">
+                <div class="bg-brand-50 p-4 sm:p-5 rounded-2xl mb-6 border border-brand-100 flex flex-col sm:flex-row justify-between sm:items-center gap-3">
                     <div>
-                        <div class="text-[10px] font-black text-brand-600 uppercase tracking-widest">신청 기업</div>
-                        <div class="text-sm font-black text-slate-800 mt-1" id="checkCompanyDisplay"></div>
+                        <div class="text-[9px] sm:text-[10px] font-black text-brand-600 uppercase tracking-widest">신청 기업</div>
+                        <div class="text-xs sm:text-sm font-black text-slate-800 mt-1 truncate" id="checkCompanyDisplay"></div>
                     </div>
-                    <div class="text-right">
-                        <div class="text-[10px] font-black text-brand-600 uppercase tracking-widest">담당자</div>
-                        <div class="text-sm font-black text-slate-800 mt-1" id="checkManagerDisplay"></div>
+                    <div class="sm:text-right">
+                        <div class="text-[9px] sm:text-[10px] font-black text-brand-600 uppercase tracking-widest">담당자</div>
+                        <div class="text-xs sm:text-sm font-black text-slate-800 mt-1 truncate" id="checkManagerDisplay"></div>
                     </div>
                 </div>
 
-                <div id="checkResult" class="space-y-3 max-h-60 overflow-y-auto no-scrollbar min-h-[150px]">
-                </div>
+                <div id="checkResult" class="space-y-3 min-h-[150px]"></div>
 
-                <button onclick="fetchMyApplications()" class="w-full mt-4 border border-slate-200 text-slate-600 bg-white py-3 rounded-xl font-bold text-sm hover:bg-slate-50 transition-all"><i class="fa-solid fa-rotate-right mr-1"></i> 새로고침</button>
+                <button onclick="fetchMyApplications()" class="w-full mt-6 border border-slate-200 text-slate-600 bg-white py-3 rounded-xl font-bold text-xs sm:text-sm hover:bg-slate-50 transition-all"><i class="fa-solid fa-rotate-right mr-1"></i> 새로고침</button>
             </div>
         </div>
     </div>
 
-    <!-- 가이드 모달 -->
-    <div id="guideModal" class="fixed inset-0 z-[100] hidden flex items-start justify-center p-4 sm:p-6 pt-20">
+    <div id="guideModal" class="fixed inset-0 z-[100] hidden flex items-start justify-center p-4 pt-16 sm:pt-20">
         <div class="absolute inset-0 bg-slate-950/80 backdrop-blur-sm" onclick="closeGuide()"></div>
-        <div class="relative bg-white w-full max-w-5xl max-h-[90vh] overflow-y-auto rounded-[2.5rem] shadow-2xl flex flex-col no-scrollbar border border-white/10 animate-in zoom-in-95 duration-300">
-            <div class="bg-slate-900 text-white p-8 text-center relative">
-                <button onclick="closeGuide()" class="absolute top-6 right-6 text-white/50 hover:text-white transition-colors">
-                    <i class="fa-solid fa-xmark text-2xl"></i>
+        <div class="relative bg-white w-full max-w-5xl max-h-[85vh] sm:max-h-[90vh] overflow-y-auto rounded-3xl sm:rounded-[2.5rem] shadow-2xl flex flex-col no-scrollbar border border-white/10 animate-in zoom-in-95 duration-300">
+            <div class="bg-slate-900 text-white p-6 sm:p-8 text-center relative shrink-0">
+                <button onclick="closeGuide()" class="absolute top-4 sm:top-6 right-4 sm:right-6 text-white/50 hover:text-white transition-colors p-2">
+                    <i class="fa-solid fa-xmark text-xl sm:text-2xl"></i>
                 </button>
-                <div class="bg-brand-600 text-white px-3 py-1 rounded w-fit mx-auto font-black text-[10px] mb-3 tracking-widest uppercase">NEO 2026</div>
-                <h2 class="text-2xl md:text-3xl font-black tracking-tighter">2026 뉴에너지 페어 오송 이용 가이드</h2>
+                <div class="bg-brand-600 text-white px-3 py-1 rounded w-fit mx-auto font-black text-[9px] sm:text-[10px] mb-3 tracking-widest uppercase">NEO 2026</div>
+                <h2 class="text-xl sm:text-2xl md:text-3xl font-black tracking-tighter">2026 뉴에너지 페어 오송 이용 가이드</h2>
             </div>
             
-            <div class="p-8 md:p-12 space-y-12">
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                    <div class="flex flex-col items-center text-center space-y-4">
-                        <div class="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center text-xl font-black shadow-inner text-brand-600"><i class="fa-solid fa-magnifying-glass"></i></div>
-                        <h4 class="font-black text-lg text-slate-900">참여 기업 탐색</h4>
-                        <p class="text-xs text-slate-500 font-medium leading-relaxed">기업명, 관심 기술, 국가를 통해<br>다양한 해외 바이어를 검색하세요.</p>
+            <div class="p-6 sm:p-8 md:p-12 space-y-8 sm:space-y-12">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
+                    <div class="flex flex-row sm:flex-col items-center sm:text-center gap-4 sm:gap-0 sm:space-y-4">
+                        <div class="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center text-xl font-black shadow-inner text-brand-600 shrink-0"><i class="fa-solid fa-magnifying-glass"></i></div>
+                        <div>
+                            <h4 class="font-black text-base sm:text-lg text-slate-900 text-left sm:text-center mb-1">참여 기업 탐색</h4>
+                            <p class="text-[11px] sm:text-xs text-slate-500 font-medium leading-relaxed text-left sm:text-center">기업명, 관심 기술, 국가를 통해 다양한 해외 바이어를 검색하세요.</p>
+                        </div>
                     </div>
-                    <div class="flex flex-col items-center text-center space-y-4">
-                        <div class="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center text-xl font-black shadow-inner text-brand-600"><i class="fa-regular fa-file-lines"></i></div>
-                        <h4 class="font-black text-lg text-slate-900">상세 정보 열람</h4>
-                        <p class="text-xs text-slate-500 font-medium leading-relaxed">기업 카드를 클릭해<br><span class="text-brand-600 font-bold">도입 희망 기술 및 전략</span>을 확인하세요.</p>
+                    <div class="flex flex-row sm:flex-col items-center sm:text-center gap-4 sm:gap-0 sm:space-y-4">
+                        <div class="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center text-xl font-black shadow-inner text-brand-600 shrink-0"><i class="fa-regular fa-file-lines"></i></div>
+                        <div>
+                            <h4 class="font-black text-base sm:text-lg text-slate-900 text-left sm:text-center mb-1">상세 정보 열람</h4>
+                            <p class="text-[11px] sm:text-xs text-slate-500 font-medium leading-relaxed text-left sm:text-center">기업 카드를 클릭해 <span class="text-brand-600 font-bold">도입 희망 기술 및 전략</span>을 확인하세요.</p>
+                        </div>
                     </div>
-                    <div class="flex flex-col items-center text-center space-y-4">
-                        <div class="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center text-xl font-black shadow-inner text-brand-600"><i class="fa-solid fa-handshake"></i></div>
-                        <h4 class="font-black text-lg text-slate-900">미팅 신청 및 취소</h4>
-                        <p class="text-xs text-slate-500 font-medium leading-relaxed">기업 정보 및 담당자 확인 과정 없이<br><span class="text-brand-600 font-bold">원클릭 미팅 신청</span>이 가능합니다.</p>
+                    <div class="flex flex-row sm:flex-col items-center sm:text-center gap-4 sm:gap-0 sm:space-y-4">
+                        <div class="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center text-xl font-black shadow-inner text-brand-600 shrink-0"><i class="fa-solid fa-handshake"></i></div>
+                        <div>
+                            <h4 class="font-black text-base sm:text-lg text-slate-900 text-left sm:text-center mb-1">미팅 신청 및 취소</h4>
+                            <p class="text-[11px] sm:text-xs text-slate-500 font-medium leading-relaxed text-left sm:text-center">과정 없이 <span class="text-brand-600 font-bold">원클릭 미팅 신청</span>이 가능합니다.</p>
+                        </div>
                     </div>
-                    <div class="flex flex-col items-center text-center space-y-4">
-                        <div class="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center text-xl font-black shadow-inner border border-brand-100 text-brand-600"><i class="fa-solid fa-list-check"></i></div>
-                        <h4 class="font-black text-lg text-slate-900">내역 실시간 확인</h4>
-                        <p class="text-xs text-slate-500 font-medium leading-relaxed">상단 <span class="text-brand-600 font-bold">[내 내역 확인]</span> 메뉴에서<br>신청된 스케줄을 즉시 조회하세요.</p>
+                    <div class="flex flex-row sm:flex-col items-center sm:text-center gap-4 sm:gap-0 sm:space-y-4">
+                        <div class="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center text-xl font-black shadow-inner border border-brand-100 text-brand-600 shrink-0"><i class="fa-solid fa-list-check"></i></div>
+                        <div>
+                            <h4 class="font-black text-base sm:text-lg text-slate-900 text-left sm:text-center mb-1">내역 실시간 확인</h4>
+                            <p class="text-[11px] sm:text-xs text-slate-500 font-medium leading-relaxed text-left sm:text-center">상단 <span class="text-brand-600 font-bold">[내역 확인]</span>에서 신청된 스케줄을 조회하세요.</p>
+                        </div>
                     </div>
                 </div>
 
-                <div class="bg-brand-50 p-6 rounded-[2rem] border-2 border-dashed border-brand-200 flex gap-4 items-start">
-                    <i class="fa-solid fa-circle-info text-brand-600 mt-1"></i>
-                    <p class="text-xs text-slate-600 font-medium leading-relaxed">
+                <div class="bg-brand-50 p-5 sm:p-6 rounded-2xl sm:rounded-[2rem] border-2 border-dashed border-brand-200 flex gap-3 sm:gap-4 items-start">
+                    <i class="fa-solid fa-circle-info text-brand-600 mt-0.5 sm:mt-1"></i>
+                    <p class="text-[11px] sm:text-xs text-slate-600 font-medium leading-relaxed">
                         신청 및 취소는 시스템에 실시간 기록됩니다. 배정된 시간표를 변경하려면 반드시 기존 내역을 <strong>[매칭 취소 요청]</strong>으로 변경 제출 후 새로 신청해 주세요.
                     </p>
                 </div>
 
                 <div class="flex flex-col sm:flex-row gap-4">
-                    <button onclick="closeGuide()" class="flex-1 bg-slate-950 text-white py-5 rounded-2xl font-black text-lg hover:bg-black transition-all">가이드 닫기</button>
+                    <button onclick="closeGuide()" class="flex-1 bg-slate-950 text-white py-4 sm:py-5 rounded-2xl font-black text-base sm:text-lg hover:bg-black transition-all">가이드 닫기</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- 헤더 영역 -->
     <header class="bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40">
-        <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <div class="bg-slate-900 text-white px-3 py-1 rounded font-black text-lg tracking-tighter flex items-center gap-2">
+        <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-2 overflow-x-auto no-scrollbar">
+            <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+                <div class="bg-slate-900 text-white px-2.5 sm:px-3 py-1 rounded font-black text-sm sm:text-lg tracking-tighter flex items-center gap-1.5 sm:gap-2">
                     <i class="fa-solid fa-leaf text-brand-400"></i> NEO 2026
                 </div>
-                <div class="h-5 w-[1px] bg-slate-200"></div>
-                <!-- 로그인된 사용자 정보 표시 영역 -->
-                <div id="loggedInInfo" class="hidden text-[10px] sm:text-xs font-black bg-brand-50 text-brand-700 px-3 py-1.5 rounded-full border border-brand-100">
+                <div class="hidden sm:block h-5 w-[1px] bg-slate-200"></div>
+                <div id="loggedInInfo" class="hidden text-[9px] sm:text-[10px] md:text-xs font-black bg-brand-50 text-brand-700 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full border border-brand-100 max-w-[120px] sm:max-w-none truncate">
                 </div>
             </div>
-            <div class="flex gap-1.5 sm:gap-3 items-center">
-                <button id="directScheduleBtn" onclick="handleDirectScheduleView()" class="text-[10px] font-black text-white energy-gradient hover:opacity-90 transition-colors flex items-center gap-1.5 px-3 py-1.5 rounded-full shadow-md whitespace-nowrap">
-    <i class="fa-regular fa-calendar-check"></i> <span class="hidden sm:inline">나의</span> 일정표 확인<span class="hidden sm:inline">하기</span>
-</button>
-                <button onclick="openCheckModal()" class="text-[10px] font-black text-slate-600 hover:text-brand-600 hover:bg-brand-50 transition-colors flex items-center gap-1.5 border-2 border-slate-100 hover:border-brand-200 px-3 py-1.5 rounded-full bg-white whitespace-nowrap">
-                    <i class="fa-solid fa-magnifying-glass"></i> 내 내역<span class="hidden sm:inline"> 실시간 조회</span>
+            <div class="flex gap-1.5 sm:gap-3 items-center shrink-0">
+                <button id="directScheduleBtn" onclick="handleDirectScheduleView()" class="text-[9px] sm:text-[10px] font-black text-white energy-gradient hover:opacity-90 transition-colors flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full shadow-md whitespace-nowrap">
+                    <i class="fa-regular fa-calendar-check"></i> <span class="hidden md:inline">나의</span> 일정표<span class="hidden sm:inline"> 확인하기</span>
                 </button>
-                <button onclick="openGuide()" class="text-[10px] font-black text-slate-400 hover:text-slate-800 transition-colors flex items-center gap-1.5 border border-slate-200 px-3 py-1.5 rounded-full bg-white whitespace-nowrap hidden sm:flex">
-                    <i class="fa-solid fa-circle-question"></i> 이용 안내
+                <button onclick="openCheckModal()" class="text-[9px] sm:text-[10px] font-black text-slate-600 hover:text-brand-600 hover:bg-brand-50 transition-colors flex items-center gap-1 sm:gap-1.5 border border-slate-200 sm:border-2 sm:border-slate-100 hover:border-brand-200 px-2.5 sm:px-3 py-1.5 rounded-full bg-white whitespace-nowrap">
+                    <i class="fa-solid fa-magnifying-glass"></i> 내역조회
+                </button>
+                <button onclick="openGuide()" class="text-[9px] sm:text-[10px] font-black text-slate-400 hover:text-slate-800 transition-colors flex items-center gap-1 sm:gap-1.5 border border-slate-200 px-2.5 sm:px-3 py-1.5 rounded-full bg-white whitespace-nowrap">
+                    <i class="fa-solid fa-circle-question"></i> 안내
                 </button>
             </div>
         </div>
     </header>
 
-    <section class="relative bg-slate-900 text-white py-20 px-6 text-center overflow-hidden">
+    <section class="relative bg-slate-900 text-white py-14 sm:py-20 px-4 sm:px-6 text-center overflow-hidden">
         <div class="absolute inset-0 opacity-40">
             <img src="https://images.unsplash.com/photo-1508514177221-188b1cf16e9d?auto=format&fit=crop&w=1200&q=80" alt="Solar Panels and Renewable Energy" class="w-full h-full object-cover">
         </div>
         <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/60 to-transparent"></div>
         <div class="relative z-10 max-w-4xl mx-auto">
-            <div class="inline-block bg-brand-500/20 text-brand-300 border border-brand-400/30 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest mb-6 backdrop-blur-sm">
+            <div class="inline-block bg-brand-500/20 text-brand-300 border border-brand-400/30 px-3 sm:px-4 py-1 sm:py-1.5 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-widest mb-4 sm:mb-6 backdrop-blur-sm">
                 Global B2B Business Matching
             </div>
-            <h1 class="text-4xl md:text-6xl font-black mb-4 tracking-tighter">NEO 2026 <br class="sm:hidden"> 해외 바이어 디렉토리</h1>
-            <p class="text-lg md:text-xl text-slate-300 font-medium mb-10">성공적인 친환경 파트너십을 위한 글로벌 에너지 기업 심층 분석 보고서</p>
-            <div class="flex flex-wrap justify-center gap-3 text-xs font-bold">
-                <span class="bg-white/10 backdrop-blur-md px-5 py-2.5 rounded-full border border-white/20 flex items-center gap-2"><i class="fa-regular fa-calendar"></i> 2026. 07. 08 - 10</span>
-                <span class="energy-gradient px-5 py-2.5 rounded-full shadow-lg shadow-brand-500/20 flex items-center gap-2"><i class="fa-solid fa-location-dot"></i> OSCO </span>
+            <h1 class="text-3xl sm:text-4xl md:text-6xl font-black mb-3 sm:mb-4 tracking-tighter leading-tight">NEO 2026 <br class="sm:hidden"> 해외 바이어 디렉토리</h1>
+            <p class="text-sm sm:text-lg md:text-xl text-slate-300 font-medium mb-8 sm:mb-10 px-4">성공적인 친환경 파트너십을 위한 글로벌 에너지 기업 심층 분석 보고서</p>
+            <div class="flex flex-col sm:flex-row justify-center gap-2 sm:gap-3 text-[11px] sm:text-xs font-bold items-center">
+                <span class="bg-white/10 backdrop-blur-md px-4 sm:px-5 py-2 sm:py-2.5 rounded-full border border-white/20 flex items-center gap-2"><i class="fa-regular fa-calendar"></i> 2026. 07. 08 - 10</span>
+                <span class="energy-gradient px-4 sm:px-5 py-2 sm:py-2.5 rounded-full shadow-lg shadow-brand-500/20 flex items-center gap-2"><i class="fa-solid fa-location-dot"></i> OSCO </span>
             </div>
         </div>
     </section>
 
-    <div class="max-w-7xl mx-auto px-4 mt-12">
-        <div class="flex flex-col gap-6 border-b border-slate-200 pb-8">
+    <div class="max-w-7xl mx-auto px-4 mt-8 sm:mt-12">
+        <div class="flex flex-col gap-4 sm:gap-6 border-b border-slate-200 pb-6 sm:pb-8">
             <div class="relative w-full">
-                <i class="fa-solid fa-search absolute left-5 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                <input type="text" id="searchInput" onkeyup="filterBuyers()" placeholder="기업명, 관심 기술(ESS, 태양광), 국가 검색..." class="w-full pl-12 pr-6 py-4 rounded-2xl border-2 border-slate-200 focus:outline-none focus:border-brand-500 text-sm font-bold shadow-sm transition-colors">
+                <i class="fa-solid fa-search absolute left-4 sm:left-5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                <input type="text" id="searchInput" onkeyup="filterBuyers()" placeholder="기업명, 기술(ESS, 태양광), 국가 검색..." class="w-full pl-10 sm:pl-12 pr-4 sm:pr-6 py-3 sm:py-4 rounded-xl sm:rounded-2xl border-2 border-slate-200 focus:outline-none focus:border-brand-500 text-xs sm:text-sm font-bold shadow-sm transition-colors">
             </div>
             
-            <div class="flex flex-wrap gap-2" id="filterContainer">
-                <button onclick="setFilter('전체', this)" class="filter-btn px-5 py-2 rounded-full text-sm font-black transition-all bg-brand-600 text-white shadow-md">전체 기업</button>
-                <button onclick="setFilter('ESS', this)" class="filter-btn px-5 py-2 rounded-full text-sm font-black transition-all bg-white text-slate-500 border border-slate-200 hover:border-brand-500 hover:text-brand-600">ESS (에너지저장)</button>
-                <button onclick="setFilter('태양열 패널', this)" class="filter-btn px-5 py-2 rounded-full text-sm font-black transition-all bg-white text-slate-500 border border-slate-200 hover:border-brand-500 hover:text-brand-600">태양열·태양광</button>
-                <button onclick="setFilter('수소', this)" class="filter-btn px-5 py-2 rounded-full text-sm font-black transition-all bg-white text-slate-500 border border-slate-200 hover:border-brand-500 hover:text-brand-600">수소 에너지</button>
-                <button onclick="setFilter('부품', this)" class="filter-btn px-5 py-2 rounded-full text-sm font-black transition-all bg-white text-slate-500 border border-slate-200 hover:border-brand-500 hover:text-brand-600">부품 및 장비</button>
+            <div class="flex overflow-x-auto sm:flex-wrap gap-2 pb-2 sm:pb-0 no-scrollbar" id="filterContainer">
+                <button onclick="setFilter('전체', this)" class="filter-btn px-4 sm:px-5 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-black transition-all bg-brand-600 text-white shadow-md whitespace-nowrap flex-shrink-0">전체 기업</button>
+                <button onclick="setFilter('ESS', this)" class="filter-btn px-4 sm:px-5 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-black transition-all bg-white text-slate-500 border border-slate-200 hover:border-brand-500 hover:text-brand-600 whitespace-nowrap flex-shrink-0">ESS (에너지저장)</button>
+                <button onclick="setFilter('태양열 패널', this)" class="filter-btn px-4 sm:px-5 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-black transition-all bg-white text-slate-500 border border-slate-200 hover:border-brand-500 hover:text-brand-600 whitespace-nowrap flex-shrink-0">태양열·태양광</button>
+                <button onclick="setFilter('수소', this)" class="filter-btn px-4 sm:px-5 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-black transition-all bg-white text-slate-500 border border-slate-200 hover:border-brand-500 hover:text-brand-600 whitespace-nowrap flex-shrink-0">수소 에너지</button>
+                <button onclick="setFilter('부품', this)" class="filter-btn px-4 sm:px-5 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-black transition-all bg-white text-slate-500 border border-slate-200 hover:border-brand-500 hover:text-brand-600 whitespace-nowrap flex-shrink-0">부품 및 장비</button>
             </div>
         </div>
     </div>
 
-    <main class="max-w-7xl mx-auto px-4 py-12">
-        <div id="buyerGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"></div>
+    <main class="max-w-7xl mx-auto px-4 py-8 sm:py-12">
+        <div id="buyerGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 sm:gap-8"></div>
     </main>
 
-    <!-- 상세정보 모달 -->
-    <div id="modal" class="fixed inset-0 z-50 hidden flex items-start justify-center p-4 sm:p-8 pt-20">
+    <div id="modal" class="fixed inset-0 z-50 hidden flex items-start justify-center p-4 pt-16 sm:pt-20">
         <div class="absolute inset-0 bg-slate-950/90 backdrop-blur-md" onclick="closeModal()"></div>
-        <div class="relative bg-white w-full max-w-3xl max-h-[92vh] overflow-y-auto rounded-[3rem] shadow-2xl flex flex-col no-scrollbar border border-white/10 animate-in zoom-in-95 duration-300">
-            <div class="p-8 sm:p-12 sticky top-0 bg-white/95 backdrop-blur-sm border-b z-10 flex justify-between items-start gap-4">
+        <div class="relative bg-white w-full max-w-3xl max-h-[85vh] sm:max-h-[92vh] overflow-y-auto rounded-3xl sm:rounded-[3rem] shadow-2xl flex flex-col no-scrollbar border border-white/10 animate-in zoom-in-95 duration-300">
+            <div class="p-5 sm:p-12 sticky top-0 bg-white/95 backdrop-blur-sm border-b z-10 flex justify-between items-start gap-4">
                 <div id="modalHeader" class="flex-1 w-full"></div>
-                <button onclick="closeModal()" class="p-3 hover:bg-slate-100 rounded-full transition-all group shrink-0 -mr-3 -mt-3">
-                    <i class="fa-solid fa-xmark text-3xl text-slate-300 group-hover:text-slate-900"></i>
+                <button onclick="closeModal()" class="p-2 sm:p-3 hover:bg-slate-100 rounded-full transition-all group shrink-0 -mr-2 sm:-mr-3 -mt-2 sm:-mt-3">
+                    <i class="fa-solid fa-xmark text-2xl sm:text-3xl text-slate-300 group-hover:text-slate-900"></i>
                 </button>
             </div>
-            <div id="modalBody" class="p-8 sm:p-12"></div>
+            <div id="modalBody" class="p-5 sm:p-12"></div>
         </div>
     </div>
 
@@ -252,7 +250,6 @@
         let loggedInManager = null;
         let tempSelectedCompany = null;
 
-        // 기업 사업자 등록번호 데이터 (실제 데이터 적용 완료)
         const korCompanies = [
             {name: "성창 주식회사", num: "32849"},
             {name: "(주)큐에스에프", num: "02679"},
@@ -353,7 +350,6 @@
         ];
 
         window.onload = function() {
-            // 세션 체크 후 로그인/초기화 분기
             const sessionCompany = sessionStorage.getItem('neo_company');
             const sessionManager = sessionStorage.getItem('neo_manager');
 
@@ -368,7 +364,6 @@
             }
         };
 
-        // --- 로그인 프로세스 로직 ---
         function handleLoginStep1() {
             const num = document.getElementById('loginBizNum').value.trim();
             if (num.length !== 5) {
@@ -376,7 +371,6 @@
                 return;
             }
 
-            // 관리자 접속 예외 처리 (백도어)
             if (num === '20266') {
                 loggedInCompany = "관리자";
                 loggedInManager = "운영팀";
@@ -401,12 +395,11 @@
                 document.getElementById('loginStep3').classList.remove('hidden');
                 document.getElementById('loginManager').focus();
             } else {
-                // 중복된 경우 선택창 렌더링
                 const listDiv = document.getElementById('duplicateCompanyList');
                 listDiv.innerHTML = '';
                 matched.forEach(c => {
                     const btn = document.createElement('button');
-                    btn.type = 'button'; // 폼 제출 방지 안전장치
+                    btn.type = 'button';
                     btn.className = "w-full text-left px-4 py-3 bg-white border border-brand-200 rounded-xl hover:border-brand-500 hover:bg-brand-50 font-black text-slate-700 transition-all text-sm";
                     btn.innerText = c.name;
                     btn.onclick = () => {
@@ -449,7 +442,6 @@
         }
 
         function initApp() {
-            // 헤더 정보 렌더링
             const infoDiv = document.getElementById('loggedInInfo');
             if (loggedInCompany === "관리자") {
                 infoDiv.innerHTML = `<i class="fa-solid fa-shield-halved text-brand-500 mr-1"></i> NEO 2026 ${loggedInCompany} <span class="font-normal opacity-70 ml-1">(${loggedInManager})</span>`;
@@ -460,14 +452,12 @@
             
             renderBuyers();
             
-            // 최초 로그인 시에만 가이드 오픈
             if(!sessionStorage.getItem('neo_guide_seen')) {
                 openGuide();
                 sessionStorage.setItem('neo_guide_seen', 'true');
             }
         }
 
-        // --- 유틸 로직 ---
         function showToast(message, type = 'error') {
             const toast = document.createElement('div');
             const bgColor = type === 'success' ? 'bg-brand-600' : 'bg-red-500';
@@ -497,7 +487,6 @@
             return map[name] || null;
         }
 
-        // --- 내역 조회 모달 ---
         function openCheckModal() {
             document.getElementById('checkModal').classList.remove('hidden');
             document.body.classList.add('modal-open');
@@ -544,7 +533,6 @@
             }
         }
 
-        // --- 기타 UI 로직 ---
         function openGuide() {
             document.getElementById('guideModal').classList.remove('hidden');
             document.body.classList.add('modal-open');
@@ -558,8 +546,8 @@
         function setFilter(category, btnElement) {
             currentFilter = category;
             const buttons = document.querySelectorAll('.filter-btn');
-            buttons.forEach(btn => { btn.className = "filter-btn px-5 py-2 rounded-full text-sm font-black transition-all bg-white text-slate-500 border border-slate-200 hover:border-brand-500 hover:text-brand-600"; });
-            if (btnElement) { btnElement.className = "filter-btn px-5 py-2 rounded-full text-sm font-black transition-all bg-brand-600 text-white shadow-md"; }
+            buttons.forEach(btn => { btn.className = "filter-btn px-4 sm:px-5 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-black transition-all bg-white text-slate-500 border border-slate-200 hover:border-brand-500 hover:text-brand-600 whitespace-nowrap flex-shrink-0"; });
+            if (btnElement) { btnElement.className = "filter-btn px-4 sm:px-5 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-black transition-all bg-brand-600 text-white shadow-md whitespace-nowrap flex-shrink-0"; }
             renderBuyers();
         }
 
@@ -592,35 +580,35 @@
             });
             
             if (filtered.length === 0) {
-                grid.innerHTML = '<div class="col-span-full py-32 text-center text-slate-400 font-bold text-xl"><i class="fa-solid fa-solar-panel mb-4 text-4xl block opacity-20"></i> 검색된 기업이 없습니다.</div>';
+                grid.innerHTML = '<div class="col-span-full py-20 sm:py-32 text-center text-slate-400 font-bold text-lg sm:text-xl"><i class="fa-solid fa-solar-panel mb-4 text-3xl sm:text-4xl block opacity-20"></i> 검색된 기업이 없습니다.</div>';
                 return;
             }
             
             filtered.forEach(b => {
                 const card = document.createElement('div');
-                card.className = "group bg-white rounded-[2rem] border border-slate-200 shadow-sm hover:shadow-2xl hover:border-brand-200 hover:-translate-y-2 transition-all duration-300 cursor-pointer overflow-hidden flex flex-col h-full";
+                card.className = "group bg-white rounded-3xl sm:rounded-[2rem] border border-slate-200 shadow-sm hover:shadow-2xl hover:border-brand-200 hover:-translate-y-2 transition-all duration-300 cursor-pointer overflow-hidden flex flex-col h-full";
                 card.onclick = () => openModal(b);
                 
                 const countryTag = b.country ? `<span class="${b.country.length >= 13 ? 'text-[9px] px-2.5' : 'text-[10px] px-3'} py-1.5 font-black uppercase tracking-widest text-slate-400 bg-slate-100 rounded-full inline-flex items-center w-fit"><i class="fa-solid fa-location-dot text-brand-500 mr-1.5"></i>${b.country}</span>` : '';
 
                 card.innerHTML = `
                     <div class="h-2 energy-gradient"></div>
-                    <div class="p-8 flex-grow flex flex-col">
-                        <div class="flex items-center gap-3 mb-6">
-                            <div class="w-10 h-10 rounded-xl bg-brand-50 flex items-center justify-center text-brand-600 shadow-sm border border-brand-100/50 shrink-0">
-                                <i class="fa-solid ${b.icon || 'fa-industry'} text-lg"></i>
+                    <div class="p-5 sm:p-8 flex-grow flex flex-col">
+                        <div class="flex items-center gap-3 mb-4 sm:mb-6">
+                            <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-brand-50 flex items-center justify-center text-brand-600 shadow-sm border border-brand-100/50 shrink-0">
+                                <i class="fa-solid ${b.icon || 'fa-industry'} text-base sm:text-lg"></i>
                             </div>
-                            <span class="text-xs font-black text-slate-600 tracking-tight leading-tight">${b.type}</span>
+                            <span class="text-[11px] sm:text-xs font-black text-slate-600 tracking-tight leading-tight">${b.type}</span>
                         </div>
-                        <h3 class="text-xl font-black mb-4 group-hover:text-brand-600 transition-colors leading-tight tracking-tighter">${b.name}</h3>
-                        <p class="text-sm text-slate-500 line-clamp-3 leading-relaxed font-medium mb-5">${b.desc}</p>
+                        <h3 class="text-lg sm:text-xl font-black mb-3 sm:mb-4 group-hover:text-brand-600 transition-colors leading-tight tracking-tighter">${b.name}</h3>
+                        <p class="text-xs sm:text-sm text-slate-500 line-clamp-3 leading-relaxed font-medium mb-4 sm:mb-5">${b.desc}</p>
                         
                         <div class="mt-auto">
                             ${countryTag}
                         </div>
                     </div>
-                    <div class="px-8 pb-8 pt-4 flex items-center justify-between text-slate-300 border-t border-slate-50 group-hover:text-brand-500 transition-all">
-                        <span class="text-xs font-black uppercase tracking-widest flex items-center gap-2">Detail View</span>
+                    <div class="px-5 sm:px-8 pb-5 sm:pb-8 pt-3 sm:pt-4 flex items-center justify-between text-slate-300 border-t border-slate-50 group-hover:text-brand-500 transition-all">
+                        <span class="text-[10px] sm:text-xs font-black uppercase tracking-widest flex items-center gap-2">Detail View</span>
                         <div class="bg-slate-50 p-2 rounded-full group-hover:bg-brand-50 transition-colors"><i class="fa-solid fa-arrow-right text-xs"></i></div>
                     </div>`;
                 grid.appendChild(card);
@@ -632,85 +620,83 @@
             const modal = document.getElementById('modal');
             const header = document.getElementById('modalHeader');
             const body = document.getElementById('modalBody');
-            
             const countryCode = getCountryCode(buyer.country);
-            const flagHtml = countryCode ? `<img src="https://flagcdn.com/w160/${countryCode}.png" alt="${buyer.country} flag" class="h-10 sm:h-14 w-auto rounded shadow-sm border border-slate-200 object-contain">` : '';
+            const flagHtml = countryCode ? `<img src="https://flagcdn.com/w160/${countryCode}.png" alt="${buyer.country} flag" class="h-8 sm:h-14 w-auto rounded shadow-sm border border-slate-200 object-contain">` : '';
 
             header.innerHTML = `
                 <div class="flex justify-between items-start w-full">
-                    <div class="flex flex-col">
-                        <div class="flex items-center gap-2 mb-3">
-                            <span class="px-3 py-1 rounded-full text-[10px] font-black text-white uppercase tracking-widest energy-gradient">해외 바이어</span>
-                            ${buyer.country ? `<span class="text-sm font-black text-slate-400 ml-1">/ ${buyer.country}</span>` : ''}
-                            <span class="px-2.5 py-1 rounded-md text-[10px] font-black tracking-tight ${buyer.koreaHistory === '한국과 거래 이력 있음' ? 'bg-blue-50 text-blue-600 border border-blue-200' : 'bg-slate-50 text-slate-400 border border-slate-200'} ml-2">
+                    <div class="flex flex-col w-full">
+                        <div class="flex flex-wrap items-center gap-2 mb-2 sm:mb-3">
+                            <span class="px-2.5 sm:px-3 py-1 rounded-full text-[9px] sm:text-[10px] font-black text-white uppercase tracking-widest energy-gradient">해외 바이어</span>
+                            ${buyer.country ? `<span class="text-xs sm:text-sm font-black text-slate-400">/ ${buyer.country}</span>` : ''}
+                            <span class="px-2 sm:px-2.5 py-1 rounded-md text-[9px] sm:text-[10px] font-black tracking-tight ${buyer.koreaHistory === '한국과 거래 이력 있음' ? 'bg-blue-50 text-blue-600 border border-blue-200' : 'bg-slate-50 text-slate-400 border border-slate-200'}">
                                 ${buyer.koreaHistory === '한국과 거래 이력 있음' ? '<i class="fa-solid fa-handshake"></i> ' : ''}${buyer.koreaHistory}
                             </span>
                         </div>
-                        <h2 class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tighter leading-tight">${buyer.name}</h2>
+                        <h2 class="text-2xl sm:text-4xl font-black text-slate-900 tracking-tighter leading-tight pr-2">${buyer.name}</h2>
                     </div>
-                    ${countryCode ? `<div class="ml-4 hidden sm:block">${flagHtml}</div>` : ''}
+                    ${countryCode ? `<div class="ml-2 sm:ml-4 shrink-0">${flagHtml}</div>` : ''}
                 </div>
-                ${countryCode ? `<div class="mt-4 sm:hidden">${flagHtml}</div>` : ''}
             `;
             
-            const itemsHtml = buyer.items ? buyer.items.split(',').map(i => `<span class="px-5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 hover:border-brand-500 hover:text-brand-700 transition-all shadow-sm"><i class="fa-solid fa-check text-brand-400 mr-1"></i> ${i.trim()}</span>`).join('') : '';
+            const itemsHtml = buyer.items ? buyer.items.split(',').map(i => `<span class="px-3 sm:px-5 py-2 sm:py-2.5 bg-slate-50 border border-slate-200 rounded-lg sm:rounded-xl text-[11px] sm:text-xs font-bold text-slate-700 hover:border-brand-500 hover:text-brand-700 transition-all shadow-sm"><i class="fa-solid fa-check text-brand-400 mr-1"></i> ${i.trim()}</span>`).join('') : '';
 
             body.innerHTML = `
-                <div class="space-y-12">
+                <div class="space-y-8 sm:space-y-12">
                     <section>
-                        <h4 class="text-base sm:text-lg font-black text-slate-700 mb-6 tracking-tight flex items-center gap-2"><i class="fa-solid fa-building text-brand-500"></i> 기업 심층 분석</h4>
-                        <div class="bg-slate-50 p-8 rounded-[2rem] border border-slate-100 shadow-inner">
-                            <p class="text-slate-700 text-lg leading-relaxed font-medium">"${buyer.desc}"</p>
+                        <h4 class="text-sm sm:text-base md:text-lg font-black text-slate-700 mb-4 sm:mb-6 tracking-tight flex items-center gap-2"><i class="fa-solid fa-building text-brand-500"></i> 기업 심층 분석</h4>
+                        <div class="bg-slate-50 p-5 sm:p-8 rounded-2xl sm:rounded-[2rem] border border-slate-100 shadow-inner">
+                            <p class="text-slate-700 text-sm sm:text-base md:text-lg leading-relaxed font-medium">"${buyer.desc}"</p>
                             
-                            <div class="grid grid-cols-2 lg:grid-cols-4 gap-6 text-xs font-black text-slate-500 border-t border-slate-200 pt-8 mt-8">
-                                <div class="space-y-2">
-                                    <p class="text-[10px] text-slate-400 uppercase tracking-widest"><i class="fa-regular fa-calendar mr-1"></i> 설립 연도</p>
-                                    <p class="text-sm text-slate-800">${buyer.established || '정보 없음'}</p>
+                            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 text-xs font-black text-slate-500 border-t border-slate-200 pt-5 sm:pt-8 mt-5 sm:mt-8">
+                                <div class="space-y-1 sm:space-y-2">
+                                    <p class="text-[9px] sm:text-[10px] text-slate-400 uppercase tracking-widest"><i class="fa-regular fa-calendar mr-1"></i> 설립 연도</p>
+                                    <p class="text-xs sm:text-sm text-slate-800">${buyer.established || '정보 없음'}</p>
                                 </div>
-                                <div class="space-y-2">
-                                    <p class="text-[10px] text-slate-400 uppercase tracking-widest"><i class="fa-solid fa-users mr-1"></i> 직원 수</p>
-                                    <p class="text-sm text-slate-800">${buyer.employees || '정보 없음'}</p>
+                                <div class="space-y-1 sm:space-y-2">
+                                    <p class="text-[9px] sm:text-[10px] text-slate-400 uppercase tracking-widest"><i class="fa-solid fa-users mr-1"></i> 직원 수</p>
+                                    <p class="text-xs sm:text-sm text-slate-800">${buyer.employees || '정보 없음'}</p>
                                 </div>
-                                <div class="space-y-2">
-                                    <p class="text-[10px] text-slate-400 uppercase tracking-widest"><i class="fa-solid fa-chart-line mr-1"></i> 연매출</p>
-                                    <p class="text-sm text-slate-800 break-words leading-tight pr-4">${buyer.revenue || '정보 없음'}</p>
+                                <div class="space-y-1 sm:space-y-2">
+                                    <p class="text-[9px] sm:text-[10px] text-slate-400 uppercase tracking-widest"><i class="fa-solid fa-chart-line mr-1"></i> 연매출</p>
+                                    <p class="text-xs sm:text-sm text-slate-800 break-words leading-tight pr-2 sm:pr-4">${buyer.revenue || '정보 없음'}</p>
                                 </div>
-                                <div class="space-y-2">
-                                    <p class="text-[10px] text-slate-400 uppercase tracking-widest"><i class="fa-solid fa-link mr-1"></i> 웹사이트</p>
-                                    ${buyer.website && buyer.website !== '없음' ? `<a href="${buyer.website.startsWith('http') ? buyer.website : 'https://' + buyer.website}" target="_blank" class="text-sm text-brand-600 hover:underline flex items-center gap-1.5 font-bold"><i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i> 홈페이지</a>` : `<span class="text-sm">정보 없음</span>`}
+                                <div class="space-y-1 sm:space-y-2">
+                                    <p class="text-[9px] sm:text-[10px] text-slate-400 uppercase tracking-widest"><i class="fa-solid fa-link mr-1"></i> 웹사이트</p>
+                                    ${buyer.website && buyer.website !== '없음' ? `<a href="${buyer.website.startsWith('http') ? buyer.website : 'https://' + buyer.website}" target="_blank" class="text-xs sm:text-sm text-brand-600 hover:underline flex items-center gap-1.5 font-bold truncate"><i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i> 홈페이지</a>` : `<span class="text-xs sm:text-sm">정보 없음</span>`}
                                 </div>
                             </div>
                         </div>
                     </section>
 
                     <section>
-                        <h4 class="text-base sm:text-lg font-black text-slate-700 mb-6 tracking-tight flex items-center gap-2"><i class="fa-solid fa-plug-circle-plus text-brand-500"></i> 도입 희망 및 관심 기술</h4>
-                        <div class="flex flex-wrap gap-2.5">${itemsHtml}</div>
+                        <h4 class="text-sm sm:text-base md:text-lg font-black text-slate-700 mb-4 sm:mb-6 tracking-tight flex items-center gap-2"><i class="fa-solid fa-plug-circle-plus text-brand-500"></i> 도입 희망 기술</h4>
+                        <div class="flex flex-wrap gap-2">${itemsHtml}</div>
                     </section>
 
-                    <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="p-8 border-2 border-slate-100 rounded-[2rem] bg-white shadow-sm flex flex-col justify-center">
-                            <h4 class="text-sm font-black text-slate-500 mb-2 tracking-tight">미팅 담당자</h4>
-                            <p class="font-black text-2xl text-slate-900 tracking-tight">${buyer.manager || '담당자 배정 중'}</p>
-                            ${buyer.date ? `<div class="mt-4 inline-flex items-center gap-2 text-xs font-bold bg-brand-50 text-brand-700 px-3 py-1.5 rounded-lg w-fit"><i class="fa-regular fa-calendar-check"></i> ${buyer.date}</div>` : ''}
+                    <section class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                        <div class="p-6 sm:p-8 border-2 border-slate-100 rounded-2xl sm:rounded-[2rem] bg-white shadow-sm flex flex-col justify-center">
+                            <h4 class="text-[11px] sm:text-sm font-black text-slate-500 mb-1 sm:mb-2 tracking-tight">미팅 담당자</h4>
+                            <p class="font-black text-lg sm:text-2xl text-slate-900 tracking-tight">${buyer.manager || '담당자 배정 중'}</p>
+                            ${buyer.date ? `<div class="mt-3 sm:mt-4 inline-flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs font-bold bg-brand-50 text-brand-700 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg w-fit"><i class="fa-regular fa-calendar-check"></i> ${buyer.date}</div>` : ''}
                         </div>
-                        <div class="p-8 bg-slate-900 text-white rounded-[2rem] shadow-xl relative overflow-hidden flex flex-col justify-center">
-                            <div class="absolute top-1/2 -translate-y-1/2 right-6 opacity-10"><i class="fa-solid fa-leaf text-8xl"></i></div>
-                            <h4 class="text-sm font-black opacity-60 mb-2 tracking-tight">목표 성과</h4>
-                            <p class="font-black text-2xl text-brand-400">Green Tech Matching</p>
-                            <p class="text-xs opacity-70 mt-2 font-medium">탄소 중립 및 신재생 기술 도입</p>
+                        <div class="p-6 sm:p-8 bg-slate-900 text-white rounded-2xl sm:rounded-[2rem] shadow-xl relative overflow-hidden flex flex-col justify-center">
+                            <div class="absolute top-1/2 -translate-y-1/2 right-4 sm:right-6 opacity-10"><i class="fa-solid fa-leaf text-6xl sm:text-8xl"></i></div>
+                            <h4 class="text-[11px] sm:text-sm font-black opacity-60 mb-1 sm:mb-2 tracking-tight">목표 성과</h4>
+                            <p class="font-black text-xl sm:text-2xl text-brand-400">Green Tech Matching</p>
+                            <p class="text-[10px] sm:text-xs opacity-70 mt-1 sm:mt-2 font-medium">탄소 중립 및 신재생 기술 도입</p>
                         </div>
                     </section>
 
-                    <section class="energy-gradient p-10 rounded-[2.5rem] text-white shadow-xl relative overflow-hidden">
-                        <div class="absolute top-0 right-0 p-8 opacity-10"><i class="fa-solid fa-rocket text-8xl"></i></div>
-                        <h4 class="text-base sm:text-lg font-black text-brand-100 mb-5 tracking-tight flex items-center gap-2"><i class="fa-solid fa-bullseye"></i> 핵심 소싱 및 파트너십 전략</h4>
-                        <p class="text-xl sm:text-2xl font-black leading-snug tracking-tighter opacity-95">${buyer.strategy || '최적의 파트너십 구축 및 기술 도입 검토'}</p>
+                    <section class="energy-gradient p-6 sm:p-10 rounded-2xl sm:rounded-[2.5rem] text-white shadow-xl relative overflow-hidden">
+                        <div class="absolute top-0 right-0 p-6 sm:p-8 opacity-10"><i class="fa-solid fa-rocket text-6xl sm:text-8xl"></i></div>
+                        <h4 class="text-sm sm:text-base md:text-lg font-black text-brand-100 mb-3 sm:mb-5 tracking-tight flex items-center gap-2"><i class="fa-solid fa-bullseye"></i> 핵심 소싱 및 전략</h4>
+                        <p class="text-base sm:text-xl md:text-2xl font-black leading-snug tracking-tighter opacity-95 relative z-10">${buyer.strategy || '최적의 파트너십 구축 및 기술 도입 검토'}</p>
                     </section>
 
-                    <div class="pt-6 flex flex-col sm:flex-row gap-4 border-t border-slate-100">
-                        <button onclick="showApplyForm()" class="flex-1 bg-slate-900 text-white py-5 rounded-2xl font-black text-lg hover:bg-black transition-all shadow-xl active:scale-[0.98] border border-slate-800">1:1 비즈니스 미팅 신청</button>
-                        <button onclick="closeModal()" class="px-10 py-5 rounded-2xl font-black text-slate-500 bg-slate-50 hover:bg-slate-100 transition-all text-lg border border-slate-200">닫기</button>
+                    <div class="pt-4 sm:pt-6 flex flex-col sm:flex-row gap-3 sm:gap-4 border-t border-slate-100">
+                        <button onclick="showApplyForm()" class="flex-1 bg-slate-900 text-white py-4 sm:py-5 rounded-xl sm:rounded-2xl font-black text-base sm:text-lg hover:bg-black transition-all shadow-xl active:scale-[0.98] border border-slate-800">1:1 비즈니스 미팅 신청</button>
+                        <button onclick="closeModal()" class="px-6 sm:px-10 py-3 sm:py-5 rounded-xl sm:rounded-2xl font-black text-slate-500 bg-slate-50 hover:bg-slate-100 transition-all text-sm sm:text-lg border border-slate-200">닫기</button>
                     </div>
                 </div>`;
             modal.classList.remove('hidden');
@@ -722,25 +708,25 @@
 
             body.innerHTML = `
                 <div class="animate-in slide-in-from-right-8 duration-500">
-                    <div class="flex items-center gap-3 mb-8">
-                        <div class="w-2 h-8 energy-gradient rounded-full"></div>
-                        <h3 class="text-2xl font-black text-slate-900 tracking-tighter">B2B 미팅 신청서 작성</h3>
+                    <div class="flex items-center gap-2 sm:gap-3 mb-6 sm:mb-8">
+                        <div class="w-1.5 sm:w-2 h-6 sm:h-8 energy-gradient rounded-full"></div>
+                        <h3 class="text-lg sm:text-2xl font-black text-slate-900 tracking-tighter">B2B 미팅 신청서 작성</h3>
                     </div>
-                    <form onsubmit="handleApply(event)" id="matchingForm" class="space-y-8 bg-slate-50 p-8 rounded-[2rem] border border-slate-100">
-                        <div class="flex flex-col sm:flex-row gap-6 bg-white p-6 rounded-xl border border-brand-100">
+                    <form onsubmit="handleApply(event)" id="matchingForm" class="space-y-6 sm:space-y-8 bg-slate-50 p-5 sm:p-8 rounded-2xl sm:rounded-[2rem] border border-slate-100">
+                        <div class="flex flex-col sm:flex-row gap-4 sm:gap-6 bg-white p-4 sm:p-6 rounded-xl border border-brand-100">
                             <div class="space-y-1 flex-1">
-                                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest"><i class="fa-solid fa-building mr-1"></i> 신청 기업</label>
-                                <div class="text-lg font-black text-slate-800">${loggedInCompany}</div>
+                                <label class="block text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest"><i class="fa-solid fa-building mr-1"></i> 신청 기업</label>
+                                <div class="text-sm sm:text-lg font-black text-slate-800 break-words">${loggedInCompany}</div>
                             </div>
-                            <div class="space-y-1 flex-1 sm:border-l sm:border-slate-100 sm:pl-6">
-                                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest"><i class="fa-solid fa-user-tie mr-1"></i> 담당자</label>
-                                <div class="text-lg font-black text-slate-800">${loggedInManager}</div>
+                            <div class="space-y-1 flex-1 sm:border-l sm:border-slate-100 sm:pl-6 pt-3 sm:pt-0 border-t sm:border-t-0 border-slate-100">
+                                <label class="block text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest"><i class="fa-solid fa-user-tie mr-1"></i> 담당자</label>
+                                <div class="text-sm sm:text-lg font-black text-slate-800">${loggedInManager}</div>
                             </div>
                         </div>
 
-                        <div class="space-y-3">
-                            <label class="block text-xs font-black text-slate-500 uppercase tracking-widest ml-1"><i class="fa-solid fa-clock mr-1"></i> 희망 상담 시간 선택</label>
-                            <select id="inputTime" required class="w-full px-5 py-4 rounded-xl border border-slate-200 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all font-bold text-base bg-white shadow-sm appearance-none cursor-pointer">
+                        <div class="space-y-2 sm:space-y-3">
+                            <label class="block text-[11px] sm:text-xs font-black text-slate-500 uppercase tracking-widest ml-1"><i class="fa-solid fa-clock mr-1"></i> 희망 상담 시간 선택</label>
+                            <select id="inputTime" required class="w-full px-4 sm:px-5 py-3 sm:py-4 rounded-xl border border-slate-200 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all font-bold text-sm sm:text-base bg-white shadow-sm appearance-none cursor-pointer">
                                 <option value="" disabled selected>원하시는 타임을 선택해 주세요</option>
                                 <option value="7/08(수) 오전">7/08(수) 오전 (10:00 - 12:00)</option>
                                 <option value="7/08(수) 오후">7/08(수) 오후 (13:00 - 17:00)</option>
@@ -748,9 +734,9 @@
                                 <option value="매칭 취소 요청" class="text-red-600 font-black">⚠️ 기존 매칭 취소 요청</option>
                             </select>
                         </div>
-                        <div class="flex flex-col sm:flex-row gap-4 pt-4">
-                            <button type="submit" id="submitBtn" class="flex-1 energy-gradient text-white py-5 rounded-xl font-black text-lg shadow-lg hover:shadow-brand-500/30 transition-all active:scale-95 flex items-center justify-center gap-2"><i class="fa-solid fa-paper-plane"></i> 원클릭 신청 완료</button>
-                            <button type="button" onclick="closeModal()" class="px-8 py-5 rounded-xl font-black text-slate-500 border border-slate-200 hover:bg-slate-200 transition-all text-lg bg-white">작성 취소</button>
+                        <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-2 sm:pt-4">
+                            <button type="submit" id="submitBtn" class="flex-1 energy-gradient text-white py-4 sm:py-5 rounded-xl font-black text-base sm:text-lg shadow-lg hover:shadow-brand-500/30 transition-all active:scale-95 flex items-center justify-center gap-2"><i class="fa-solid fa-paper-plane"></i> 원클릭 신청 완료</button>
+                            <button type="button" onclick="closeModal()" class="px-6 sm:px-8 py-3 sm:py-5 rounded-xl font-black text-slate-500 border border-slate-200 hover:bg-slate-200 transition-all text-sm sm:text-lg bg-white">작성 취소</button>
                         </div>
                     </form>
                 </div>`;
@@ -780,7 +766,7 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
-                showToast('미팅 요청이 기록되었습니다. [내 내역 확인]에서 확인하세요.', 'success');
+                showToast('미팅 요청이 기록되었습니다. [내역조회]에서 확인하세요.', 'success');
                 closeModal();
             } catch (err) {
                 showToast('네트워크 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.', 'error');
@@ -794,199 +780,193 @@
             document.getElementById('modal').classList.add('hidden');
             document.body.classList.remove('modal-open');
         }
-// 운영 포털 마스터 DB 접근 주소
-const MASTER_GAS_URL = 'https://script.google.com/macros/s/AKfycbxO3gHGZbsBmjaX-hfFHP-s7trR6OEKj_Rw-3G5-B0ehMOC3JTl1h2r7rEF8M3XmsqO/exec';
 
-async function handleDirectScheduleView() {
-    // 처음에 로그인한 세션 정보(loggedInCompany)를 그대로 활용
-    if (!loggedInCompany || loggedInCompany === '관리자') {
-        return showToast('기업 로그인 상태에서만 일정표를 확인할 수 있습니다.', 'error');
-    }
+        const MASTER_GAS_URL = 'https://script.google.com/macros/s/AKfycbxO3gHGZbsBmjaX-hfFHP-s7trR6OEKj_Rw-3G5-B0ehMOC3JTl1h2r7rEF8M3XmsqO/exec';
 
-    const btn = document.getElementById('directScheduleBtn');
-    const originalText = btn.innerHTML; // 원래 버튼 텍스트 백업
-    btn.innerHTML = '<i class="fa-solid fa-spinner spinner"></i> 불러오는 중...';
-    btn.disabled = true;
-
-    try {
-        const res = await fetch(`${MASTER_GAS_URL}?t=${new Date().getTime()}`);
-        const data = await res.json();
-        const events = data.events;
-
-        let targetCompany = null;
-        let targetEvent = null;
-
-        // 로그인된 기업명(loggedInCompany)으로 바로 매칭
-        const searchName = loggedInCompany.toLowerCase();
-        
-        for (const evtId in events) {
-            if(events[evtId].eventName === '__accounts') continue;
-            const event = events[evtId];
-            const comps = event.companies || [];
-            const found = comps.find(c => c.name.toLowerCase().includes(searchName));
-            
-            if (found) {
-                targetCompany = found;
-                targetEvent = event;
-                break;
+        async function handleDirectScheduleView() {
+            if (!loggedInCompany || loggedInCompany === '관리자') {
+                return showToast('기업 로그인 상태에서만 일정표를 확인할 수 있습니다.', 'error');
             }
-        }
 
-        if (!targetCompany) {
-            showToast('현재 배정된 미팅 스케줄이 없습니다.', 'error');
-        } else {
-            // 스케줄 새 창 생성 (예쁜 디자인 함수 호출)
-            generateAndOpenSchedule(targetEvent, targetCompany);
-        }
+            const btn = document.getElementById('directScheduleBtn');
+            const originalText = btn.innerHTML; 
+            btn.innerHTML = '<i class="fa-solid fa-spinner spinner"></i> 불러오는 중...';
+            btn.disabled = true;
 
-    } catch (err) {
-        console.error(err);
-        showToast('서버 연결 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.', 'error');
-    } finally {
-        btn.innerHTML = originalText; // 로딩 끝나면 버튼 원상복구
-        btn.disabled = false;
-    }
-}
-function generateAndOpenSchedule(eventData, company) {
-    const config = eventData.config || {};
-    const matches = eventData.matches || {};
-    const buyers = eventData.buyers || [];
-    const tableAllocations = eventData.tableAllocations || {};
+            try {
+                const res = await fetch(`${MASTER_GAS_URL}?t=${new Date().getTime()}`);
+                const data = await res.json();
+                const events = data.events;
 
-    const buyerMap = buyers.reduce((acc, b) => { acc[b.id] = b; return acc; }, {});
+                let targetCompany = null;
+                let targetEvent = null;
 
-    // 행사 시간 슬롯 계산
-    const parseTime = (str) => { const [h, m] = (str||"00:00").split(':').map(Number); return h * 60 + m; };
-    const formatTime = (mins) => `${String(Math.floor(mins / 60)).padStart(2, '0')}:${String(mins % 60).padStart(2, '0')}`;
-    let timeSlots = [];
-    let curr = parseTime(config.startTime);
-    let lunchS = parseTime(config.lunchStart);
-    let lunchE = parseTime(config.lunchEnd);
-    
-    for (let i = 0; i < (config.sessionsPerDay || 10); i++) {
-        if (curr >= lunchS && curr < lunchE) curr = lunchE;
-        let end = curr + (config.sessionLength || 30);
-        if (curr < lunchS && end > lunchS) { curr = lunchE; end = curr + (config.sessionLength || 30); }
-        timeSlots.push({ value: `${formatTime(curr)}~${formatTime(end)}` });
-        curr = end;
-    }
-
-    // HTML 테이블 바디 생성 (디자인 개선)
-    let tbodyHTML = '';
-    (config.dates||[]).forEach((dateStr, dayIdx) => {
-        tbodyHTML += `<tr class="day-header"><td colspan="4">📅 ${dayIdx + 1}일 차 (${dateStr})</td></tr>`;
-        
-        let lastEndTime = null;
-        timeSlots.forEach(slot => {
-            const [start, end] = slot.value.split('~');
-            if (lastEndTime && lastEndTime === config.lunchStart && start === config.lunchEnd) {
-                tbodyHTML += `<tr class="lunch-row"><td colspan="4">☕ 점심 및 휴식 시간 (${config.lunchStart} ~ ${config.lunchEnd})</td></tr>`;
-            }
-            lastEndTime = end;
-
-            const bId = matches[dayIdx]?.[slot.value]?.[company.id];
-            const buyer = buyerMap[bId];
-            const tableNum = buyer ? (tableAllocations[dayIdx]?.[slot.value]?.[bId] || buyer.tableNo || '-') : '-';
-            const isBooked = !!buyer;
-            
-            // 데이터 태그 렌더링
-            const mainText = buyer ? `<span class="highlight">${buyer.company}</span> <span style="font-size:13px; color:#64748b; font-weight:500;">(${buyer.name})</span>` : '일정 없음';
-            const subText = buyer ? `<span class="badge active">T ${tableNum}</span>` : `<span class="badge">-</span>`;
-
-            tbodyHTML += `
-            <tr class="${isBooked ? '' : 'dimmed-row'}">
-                <td style="font-weight:700; color:#475569;">${dateStr}</td>
-                <td style="font-weight:900; color:#059669;">${slot.value}</td>
-                <td class="${isBooked ? '' : 'dimmed'}">${mainText}</td>
-                <td>${subText}</td>
-            </tr>`;
-        });
-    });
-
-    const title = `[기업] ${company.name} 매칭 스케줄`;
-    const theadHTML = `<tr><th width="18%">날짜</th><th width="18%">시간</th><th width="48%">매칭 바이어 소속 및 이름</th><th width="16%">테이블</th></tr>`;
-
-    // 🌟 완전 개편된 CSS 적용 HTML
-    const htmlContent = `
-        <!DOCTYPE html>
-        <html lang="ko">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>${title}</title>
-            <style>
-                @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap');
-                body { font-family: 'Noto Sans KR', sans-serif; padding: 40px 20px; color: #1e293b; background-color: #f8fafc; margin: 0; }
-                .container { max-width: 900px; margin: 0 auto; background: #fff; padding: 50px; border-radius: 32px; box-shadow: 0 20px 40px -10px rgba(0,0,0,0.05), 0 0 10px rgba(0,0,0,0.01); }
-                .header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 4px solid #059669; padding-bottom: 24px; margin-bottom: 30px; }
-                h2 { color: #0f172a; font-size: 32px; font-weight: 900; margin: 0; letter-spacing: -1.5px; line-height: 1.2; }
-                h2 span { color: #059669; }
-                .subtitle { display: block; font-size: 14px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; }
-                .btn-print { background: linear-gradient(135deg, #059669 0%, #0d9488 100%); color: white; border: none; padding: 14px 28px; border-radius: 14px; font-weight: 800; font-size: 15px; cursor: pointer; box-shadow: 0 10px 15px -3px rgba(5, 150, 105, 0.2); transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); display: flex; align-items: center; gap: 8px; outline: none; }
-                .btn-print:hover { transform: translateY(-3px); box-shadow: 0 15px 20px -5px rgba(5, 150, 105, 0.3); }
-                .btn-print:active { transform: translateY(0); }
-                table { width: 100%; border-collapse: separate; border-spacing: 0; text-align: center; font-size: 15px; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; }
-                th, td { border-bottom: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; padding: 18px 12px; }
-                th:last-child, td:last-child { border-right: none; }
-                tr:last-child td { border-bottom: none; }
-                thead tr { background-color: #f8fafc; color: #475569; }
-                th { font-weight: 900; font-size: 15px; letter-spacing: -0.5px; }
-                tbody tr { transition: background-color 0.1s; }
-                tbody tr:hover { background-color: #f1f5f9; }
-                .day-header td { background-color: #ecfdf5 !important; color: #064e3b; font-weight: 900; text-align: left; padding-left: 28px; font-size: 16px; border-top: 3px solid #34d399; letter-spacing: -0.5px; }
-                .lunch-row td { background-color: #fff7ed !important; color: #ea580c; font-weight: 800; border-top: 1px dashed #fdba74; border-bottom: 1px dashed #fdba74; font-size: 14px; }
-                .highlight { font-weight: 900; color: #0f172a; font-size: 16px; letter-spacing: -0.5px; }
-                .dimmed { color: #cbd5e1; font-weight: 600; }
-                .dimmed-row { background-color: #fafafa; }
-                .badge { display: inline-block; background: #f1f5f9; color: #94a3b8; padding: 6px 14px; border-radius: 10px; font-weight: 800; font-size: 14px; min-width: 30px; }
-                .badge.active { background: #059669; color: white; box-shadow: 0 4px 6px -1px rgba(5, 150, 105, 0.2); }
+                const searchName = loggedInCompany.toLowerCase();
                 
-                /* 프린트 시 깔끔하게 나오도록 최적화 */
-                @media print {
-                    body { padding: 0; background: #fff; }
-                    .container { box-shadow: none; padding: 0; max-width: 100%; border-radius: 0; }
-                    .header { border-bottom: 3px solid #000; padding-bottom: 15px; margin-bottom: 20px; }
-                    h2 { color: #000; font-size: 24px; }
-                    h2 span { color: #000; }
-                    .subtitle { color: #000; margin-bottom: 4px; }
-                    .btn-print { display: none; }
-                    table { border: 2px solid #000; border-radius: 0; }
-                    th, td { border-color: #444; padding: 12px 8px; }
-                    th { background-color: #f0f0f0 !important; -webkit-print-color-adjust: exact; color: #000; border-bottom: 2px solid #000; }
-                    .day-header td { background-color: #e8e8e8 !important; color: #000; border-top: 2px solid #000; padding-left: 15px; }
-                    .lunch-row td { color: #555; background-color: #fafafa !important; -webkit-print-color-adjust: exact; border-style: dashed; }
-                    .highlight { color: #000; }
-                    .badge { border: 1px solid #ddd; background: transparent; color: #666; box-shadow: none; padding: 4px 8px; }
-                    .badge.active { border: 2px solid #000; color: #000; font-weight: 900; }
-                    .dimmed-row { background-color: transparent; }
+                for (const evtId in events) {
+                    if(events[evtId].eventName === '__accounts') continue;
+                    const event = events[evtId];
+                    const comps = event.companies || [];
+                    const found = comps.find(c => c.name.toLowerCase().includes(searchName));
+                    
+                    if (found) {
+                        targetCompany = found;
+                        targetEvent = event;
+                        break;
+                    }
                 }
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <div class="header">
-                    <div>
-                        <span class="subtitle">NEO 2026 B2B Matching Schedule</span>
-                        <h2><span>${company.name}</span> 매칭 스케줄</h2>
-                    </div>
-                    <button class="btn-print" onclick="window.print()">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
-                        인쇄 / PDF 저장
-                    </button>
-                </div>
-                <table>
-                    <thead>${theadHTML}</thead>
-                    <tbody>${tbodyHTML}</tbody>
-                </table>
-            </div>
-        </body>
-        </html>
-    `;
 
-    const printWindow = window.open('', '_blank');
-    if (!printWindow) return alert('브라우저의 팝업 차단을 해제해주세요.');
-    printWindow.document.write(htmlContent);
-    printWindow.document.close();
-}    </script>
+                if (!targetCompany) {
+                    showToast('현재 배정된 미팅 스케줄이 없습니다.', 'error');
+                } else {
+                    generateAndOpenSchedule(targetEvent, targetCompany);
+                }
+
+            } catch (err) {
+                console.error(err);
+                showToast('서버 연결 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.', 'error');
+            } finally {
+                btn.innerHTML = originalText; 
+                btn.disabled = false;
+            }
+        }
+
+        function generateAndOpenSchedule(eventData, company) {
+            const config = eventData.config || {};
+            const matches = eventData.matches || {};
+            const buyers = eventData.buyers || [];
+            const tableAllocations = eventData.tableAllocations || {};
+
+            const buyerMap = buyers.reduce((acc, b) => { acc[b.id] = b; return acc; }, {});
+
+            const parseTime = (str) => { const [h, m] = (str||"00:00").split(':').map(Number); return h * 60 + m; };
+            const formatTime = (mins) => `${String(Math.floor(mins / 60)).padStart(2, '0')}:${String(mins % 60).padStart(2, '0')}`;
+            let timeSlots = [];
+            let curr = parseTime(config.startTime);
+            let lunchS = parseTime(config.lunchStart);
+            let lunchE = parseTime(config.lunchEnd);
+            
+            for (let i = 0; i < (config.sessionsPerDay || 10); i++) {
+                if (curr >= lunchS && curr < lunchE) curr = lunchE;
+                let end = curr + (config.sessionLength || 30);
+                if (curr < lunchS && end > lunchS) { curr = lunchE; end = curr + (config.sessionLength || 30); }
+                timeSlots.push({ value: `${formatTime(curr)}~${formatTime(end)}` });
+                curr = end;
+            }
+
+            let tbodyHTML = '';
+            (config.dates||[]).forEach((dateStr, dayIdx) => {
+                tbodyHTML += `<tr class="day-header"><td colspan="4">📅 ${dayIdx + 1}일 차 (${dateStr})</td></tr>`;
+                
+                let lastEndTime = null;
+                timeSlots.forEach(slot => {
+                    const [start, end] = slot.value.split('~');
+                    if (lastEndTime && lastEndTime === config.lunchStart && start === config.lunchEnd) {
+                        tbodyHTML += `<tr class="lunch-row"><td colspan="4">☕ 점심 및 휴식 시간 (${config.lunchStart} ~ ${config.lunchEnd})</td></tr>`;
+                    }
+                    lastEndTime = end;
+
+                    const bId = matches[dayIdx]?.[slot.value]?.[company.id];
+                    const buyer = buyerMap[bId];
+                    const tableNum = buyer ? (tableAllocations[dayIdx]?.[slot.value]?.[bId] || buyer.tableNo || '-') : '-';
+                    const isBooked = !!buyer;
+                    
+                    const mainText = buyer ? `<span class="highlight">${buyer.company}</span> <span style="font-size:13px; color:#64748b; font-weight:500;">(${buyer.name})</span>` : '일정 없음';
+                    const subText = buyer ? `<span class="badge active">T ${tableNum}</span>` : `<span class="badge">-</span>`;
+
+                    tbodyHTML += `
+                    <tr class="${isBooked ? '' : 'dimmed-row'}">
+                        <td style="font-weight:700; color:#475569;">${dateStr}</td>
+                        <td style="font-weight:900; color:#059669;">${slot.value}</td>
+                        <td class="${isBooked ? '' : 'dimmed'}">${mainText}</td>
+                        <td>${subText}</td>
+                    </tr>`;
+                });
+            });
+
+            const title = `[기업] ${company.name} 매칭 스케줄`;
+            const theadHTML = `<tr><th width="18%">날짜</th><th width="18%">시간</th><th width="48%">매칭 바이어 소속 및 이름</th><th width="16%">테이블</th></tr>`;
+
+            const htmlContent = `
+                <!DOCTYPE html>
+                <html lang="ko">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>${title}</title>
+                    <style>
+                        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap');
+                        body { font-family: 'Noto Sans KR', sans-serif; padding: 40px 20px; color: #1e293b; background-color: #f8fafc; margin: 0; }
+                        .container { max-width: 900px; margin: 0 auto; background: #fff; padding: 50px; border-radius: 32px; box-shadow: 0 20px 40px -10px rgba(0,0,0,0.05), 0 0 10px rgba(0,0,0,0.01); }
+                        .header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 4px solid #059669; padding-bottom: 24px; margin-bottom: 30px; }
+                        h2 { color: #0f172a; font-size: 32px; font-weight: 900; margin: 0; letter-spacing: -1.5px; line-height: 1.2; }
+                        h2 span { color: #059669; }
+                        .subtitle { display: block; font-size: 14px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; }
+                        .btn-print { background: linear-gradient(135deg, #059669 0%, #0d9488 100%); color: white; border: none; padding: 14px 28px; border-radius: 14px; font-weight: 800; font-size: 15px; cursor: pointer; box-shadow: 0 10px 15px -3px rgba(5, 150, 105, 0.2); transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); display: flex; align-items: center; gap: 8px; outline: none; }
+                        .btn-print:hover { transform: translateY(-3px); box-shadow: 0 15px 20px -5px rgba(5, 150, 105, 0.3); }
+                        .btn-print:active { transform: translateY(0); }
+                        table { width: 100%; border-collapse: separate; border-spacing: 0; text-align: center; font-size: 15px; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; }
+                        th, td { border-bottom: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; padding: 18px 12px; }
+                        th:last-child, td:last-child { border-right: none; }
+                        tr:last-child td { border-bottom: none; }
+                        thead tr { background-color: #f8fafc; color: #475569; }
+                        th { font-weight: 900; font-size: 15px; letter-spacing: -0.5px; }
+                        tbody tr { transition: background-color 0.1s; }
+                        tbody tr:hover { background-color: #f1f5f9; }
+                        .day-header td { background-color: #ecfdf5 !important; color: #064e3b; font-weight: 900; text-align: left; padding-left: 28px; font-size: 16px; border-top: 3px solid #34d399; letter-spacing: -0.5px; }
+                        .lunch-row td { background-color: #fff7ed !important; color: #ea580c; font-weight: 800; border-top: 1px dashed #fdba74; border-bottom: 1px dashed #fdba74; font-size: 14px; }
+                        .highlight { font-weight: 900; color: #0f172a; font-size: 16px; letter-spacing: -0.5px; }
+                        .dimmed { color: #cbd5e1; font-weight: 600; }
+                        .dimmed-row { background-color: #fafafa; }
+                        .badge { display: inline-block; background: #f1f5f9; color: #94a3b8; padding: 6px 14px; border-radius: 10px; font-weight: 800; font-size: 14px; min-width: 30px; }
+                        .badge.active { background: #059669; color: white; box-shadow: 0 4px 6px -1px rgba(5, 150, 105, 0.2); }
+                        
+                        @media print {
+                            body { padding: 0; background: #fff; }
+                            .container { box-shadow: none; padding: 0; max-width: 100%; border-radius: 0; }
+                            .header { border-bottom: 3px solid #000; padding-bottom: 15px; margin-bottom: 20px; }
+                            h2 { color: #000; font-size: 24px; }
+                            h2 span { color: #000; }
+                            .subtitle { color: #000; margin-bottom: 4px; }
+                            .btn-print { display: none; }
+                            table { border: 2px solid #000; border-radius: 0; }
+                            th, td { border-color: #444; padding: 12px 8px; }
+                            th { background-color: #f0f0f0 !important; -webkit-print-color-adjust: exact; color: #000; border-bottom: 2px solid #000; }
+                            .day-header td { background-color: #e8e8e8 !important; color: #000; border-top: 2px solid #000; padding-left: 15px; }
+                            .lunch-row td { color: #555; background-color: #fafafa !important; -webkit-print-color-adjust: exact; border-style: dashed; }
+                            .highlight { color: #000; }
+                            .badge { border: 1px solid #ddd; background: transparent; color: #666; box-shadow: none; padding: 4px 8px; }
+                            .badge.active { border: 2px solid #000; color: #000; font-weight: 900; }
+                            .dimmed-row { background-color: transparent; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <div class="header">
+                            <div>
+                                <span class="subtitle">NEO 2026 B2B Matching Schedule</span>
+                                <h2><span>${company.name}</span> 매칭 스케줄</h2>
+                            </div>
+                            <button class="btn-print" onclick="window.print()">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                                인쇄 / PDF 저장
+                            </button>
+                        </div>
+                        <table>
+                            <thead>${theadHTML}</thead>
+                            <tbody>${tbodyHTML}</tbody>
+                        </table>
+                    </div>
+                </body>
+                </html>
+            `;
+
+            const printWindow = window.open('', '_blank');
+            if (!printWindow) return alert('브라우저의 팝업 차단을 해제해주세요.');
+            printWindow.document.write(htmlContent);
+            printWindow.document.close();
+        }
+    </script>
 </body>
 </html>
