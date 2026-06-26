@@ -175,9 +175,9 @@
                 </div>
             </div>
             <div class="flex gap-1.5 sm:gap-3 items-center">
-                <a href="https://sites.google.com/koreabridging.com/bridging-translator/%ED%99%88" target="_blank" class="text-[10px] font-black text-white energy-gradient hover:opacity-90 transition-colors flex items-center gap-1.5 px-3 py-1.5 rounded-full shadow-md whitespace-nowrap">
-                    <i class="fa-regular fa-calendar-check"></i> <span class="hidden sm:inline">나의</span> 일정표 확인<span class="hidden sm:inline">하기</span>
-                </a>
+                <button onclick="openScheduleLoginModal()" class="text-[10px] font-black text-white energy-gradient hover:opacity-90 transition-colors flex items-center gap-1.5 px-3 py-1.5 rounded-full shadow-md whitespace-nowrap">
+    <i class="fa-regular fa-calendar-check"></i> <span class="hidden sm:inline">나의</span> 일정표 확인<span class="hidden sm:inline">하기</span>
+</button>
                 <button onclick="openCheckModal()" class="text-[10px] font-black text-slate-600 hover:text-brand-600 hover:bg-brand-50 transition-colors flex items-center gap-1.5 border-2 border-slate-100 hover:border-brand-200 px-3 py-1.5 rounded-full bg-white whitespace-nowrap">
                     <i class="fa-solid fa-magnifying-glass"></i> 내 내역<span class="hidden sm:inline"> 실시간 조회</span>
                 </button>
@@ -794,6 +794,190 @@
             document.getElementById('modal').classList.add('hidden');
             document.body.classList.remove('modal-open');
         }
+// 운영 포털 마스터 DB 접근 주소
+const MASTER_GAS_URL = 'https://script.google.com/macros/s/AKfycbxO3gHGZbsBmjaX-hfFHP-s7trR6OEKj_Rw-3G5-B0ehMOC3JTl1h2r7rEF8M3XmsqO/exec';
+
+function openScheduleLoginModal() {
+    // 바이어 프로파일에 이미 로그인 되어 있다면 자동으로 채워주는 편의 기능 추가
+    if(loggedInCompany && loggedInCompany !== '관리자') {
+        document.getElementById('schedLoginCompany').value = loggedInCompany;
+    }
+    if(loggedInManager && loggedInManager !== '운영팀') {
+        document.getElementById('schedLoginManager').value = loggedInManager;
+    }
+    document.getElementById('scheduleLoginModal').classList.remove('hidden');
+    document.body.classList.add('modal-open');
+}
+
+function closeScheduleLoginModal() {
+    document.getElementById('scheduleLoginModal').classList.add('hidden');
+    document.body.classList.remove('modal-open');
+}
+
+async function handleScheduleLogin() {
+    const companyInput = document.getElementById('schedLoginCompany').value.trim().toLowerCase();
+    const managerInput = document.getElementById('schedLoginManager').value.trim();
+
+    if (!companyInput) return showToast('기업명을 입력해주세요.', 'error');
+    if (!managerInput) return showToast('담당자 성함 및 직급을 입력해주세요.', 'error');
+
+    const btn = document.getElementById('schedLoginBtn');
+    btn.innerHTML = '<i class="fa-solid fa-spinner spinner"></i> 일정 불러오는 중...';
+    btn.disabled = true;
+
+    try {
+        const res = await fetch(`${MASTER_GAS_URL}?t=${new Date().getTime()}`);
+        const data = await res.json();
+        const events = data.events;
+
+        let targetCompany = null;
+        let targetEvent = null;
+
+        // 기업명 부분 일치 검색 (완전히 똑같지 않아도 됨)
+        for (const evtId in events) {
+            if(events[evtId].eventName === '__accounts') continue;
+            const event = events[evtId];
+            const comps = event.companies || [];
+            const found = comps.find(c => c.name.toLowerCase().includes(companyInput));
+            
+            if (found) {
+                targetCompany = found;
+                targetEvent = event;
+                break;
+            }
+        }
+
+        if (!targetCompany) {
+            showToast('해당 기업명으로 배정된 스케줄을 찾을 수 없습니다.', 'error');
+            btn.innerHTML = '일정표 확인';
+            btn.disabled = false;
+            return;
+        }
+
+        // 스케줄 새 창 생성
+        generateAndOpenSchedule(targetEvent, targetCompany);
+        closeScheduleLoginModal();
+
+    } catch (err) {
+        console.error(err);
+        showToast('서버 연결 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.', 'error');
+    } finally {
+        btn.innerHTML = '일정표 확인';
+        btn.disabled = false;
+    }
+}
+
+function generateAndOpenSchedule(eventData, company) {
+    const config = eventData.config || {};
+    const matches = eventData.matches || {};
+    const buyers = eventData.buyers || [];
+    const tableAllocations = eventData.tableAllocations || {};
+
+    const buyerMap = buyers.reduce((acc, b) => { acc[b.id] = b; return acc; }, {});
+
+    // 행사 시간 슬롯 계산 (운영 코드와 동일 로직)
+    const parseTime = (str) => { const [h, m] = (str||"00:00").split(':').map(Number); return h * 60 + m; };
+    const formatTime = (mins) => `${String(Math.floor(mins / 60)).padStart(2, '0')}:${String(mins % 60).padStart(2, '0')}`;
+    let timeSlots = [];
+    let curr = parseTime(config.startTime);
+    let lunchS = parseTime(config.lunchStart);
+    let lunchE = parseTime(config.lunchEnd);
+    
+    for (let i = 0; i < (config.sessionsPerDay || 10); i++) {
+        if (curr >= lunchS && curr < lunchE) curr = lunchE;
+        let end = curr + (config.sessionLength || 30);
+        if (curr < lunchS && end > lunchS) { curr = lunchE; end = curr + (config.sessionLength || 30); }
+        timeSlots.push({ value: `${formatTime(curr)}~${formatTime(end)}` });
+        curr = end;
+    }
+
+    // HTML 테이블 바디 생성
+    let tbodyHTML = '';
+    (config.dates||[]).forEach((dateStr, dayIdx) => {
+        tbodyHTML += `<tr class="day-header"><td colspan="4">${dayIdx + 1}일 차 (${dateStr})</td></tr>`;
+        
+        let lastEndTime = null;
+        timeSlots.forEach(slot => {
+            const [start, end] = slot.value.split('~');
+            if (lastEndTime && lastEndTime === config.lunchStart && start === config.lunchEnd) {
+                tbodyHTML += `<tr class="lunch-row"><td colspan="4">☕ 점심 및 휴식 시간 (${config.lunchStart} ~ ${config.lunchEnd})</td></tr>`;
+            }
+            lastEndTime = end;
+
+            const bId = matches[dayIdx]?.[slot.value]?.[company.id];
+            const buyer = buyerMap[bId];
+            const tableNum = buyer ? (tableAllocations[dayIdx]?.[slot.value]?.[bId] || buyer.tableNo || '-') : '-';
+            const isBooked = !!buyer;
+            const mainText = buyer ? `${buyer.company} (${buyer.name})` : '일정 없음';
+            const subText = buyer ? tableNum : '-';
+
+            tbodyHTML += `<tr><td>${dateStr}</td><td>${slot.value}</td><td class="${isBooked ? 'highlight' : 'dimmed'}">${mainText}</td><td>${subText}</td></tr>`;
+        });
+    });
+
+    // 새 창에 그리기 (운영.txt의 프린트 뷰 CSS)
+    const title = `[기업] ${company.name} 매칭 스케줄`;
+    const theadHTML = `<tr><th>날짜</th><th>시간</th><th>매칭 바이어 소속 및 이름</th><th>테이블 번호</th></tr>`;
+
+    const htmlContent = `
+        <html lang="ko">
+        <head>
+            <meta charset="UTF-8">
+            <title>${title}</title>
+            <style>
+                body{font-family:'Malgun Gothic','맑은 고딕',sans-serif;padding:20px;color:#000;}
+                h2{color:#000;border-bottom:2px solid #000;padding-bottom:10px;}
+                table{width:100%;border-collapse:collapse;margin-top:15px;text-align:center;font-size:12px;}
+                th,td{border:1px solid #444;padding:10px 8px;}
+                th{background-color:#f0f0f0;font-weight:bold;border-bottom:2px solid #000;}
+                .day-header td{background-color:#e8e8e8 !important;font-weight:bold;text-align:left;padding-left:15px;border-top:2px solid #000;}
+                .lunch-row td{background-color:#fafafa !important;color:#555;font-weight:bold;font-style:italic;border-top:1px dashed #888;border-bottom:1px dashed #888;}
+                .highlight{font-weight:bold;}
+                .dimmed{color:#aaa;}
+                @media print{ button{display:none;} body{padding:0;} }
+            </style>
+        </head>
+        <body>
+            <h2>${title}</h2>
+            <button onclick="window.print()" style="padding:10px 20px;margin-bottom:15px;cursor:pointer;background:#059669;color:white;border:none;border-radius:6px;font-weight:bold;">🖨️ 인쇄하기 / PDF 저장</button>
+            <table>
+                <thead>${theadHTML}</thead>
+                <tbody>${tbodyHTML}</tbody>
+            </table>
+        </body>
+        </html>
+    `;
+
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) return alert('브라우저의 팝업 차단을 해제해주세요.');
+    printWindow.document.write(htmlContent);
+    printWindow.document.close();
+}
     </script>
+<div id="scheduleLoginModal" class="fixed inset-0 z-[200] hidden bg-slate-900/90 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-[2rem] p-8 max-w-sm w-full shadow-2xl relative animate-in zoom-in-95 duration-300">
+        <button onclick="closeScheduleLoginModal()" class="absolute top-6 right-6 text-slate-400 hover:text-slate-900 transition-colors">
+            <i class="fa-solid fa-xmark text-xl"></i>
+        </button>
+        <div class="text-center mb-8">
+            <div class="bg-brand-500 text-white w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-4 text-xl shadow-lg shadow-brand-500/30">
+                <i class="fa-regular fa-calendar-check"></i>
+            </div>
+            <h2 class="text-2xl font-black tracking-tighter text-slate-900">나의 일정표 조회</h2>
+            <p class="text-xs font-bold text-slate-400 mt-2">기업명과 담당자 정보를 입력해주세요.</p>
+        </div>
+        <div class="space-y-4">
+            <div>
+                <label class="text-[10px] font-black text-slate-400 uppercase ml-1">아이디 (기업명)</label>
+                <input type="text" id="schedLoginCompany" placeholder="예: 성창 주식회사" class="w-full px-5 py-4 rounded-xl border-2 border-slate-100 focus:border-brand-500 outline-none font-bold text-sm transition-colors mt-1">
+            </div>
+            <div>
+                <label class="text-[10px] font-black text-slate-400 uppercase ml-1">비밀번호 (담당자명 직급)</label>
+                <input type="text" id="schedLoginManager" placeholder="예: 홍길동 과장" class="w-full px-5 py-4 rounded-xl border-2 border-slate-100 focus:border-brand-500 outline-none font-bold text-sm transition-colors mt-1" onkeypress="if(event.key === 'Enter') handleScheduleLogin()">
+            </div>
+            <button type="button" id="schedLoginBtn" onclick="handleScheduleLogin()" class="w-full energy-gradient text-white py-4 rounded-xl font-black text-lg hover:opacity-90 shadow-lg shadow-brand-500/30 transition-all mt-2">일정표 확인</button>
+        </div>
+    </div>
+</div>
 </body>
 </html>
