@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEO 2026 Buyer Profile - New Energy Fair Osong</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap');
+        body { font-family: 'Noto Sans KR', sans-serif; -webkit-font-smoothing: antialiased; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .modal-open { overflow: hidden; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .spinner { animation: spin 1s linear infinite; }
+        .guide-ui-shadow { box-shadow: 0 10px 30px -5px rgba(0,0,0,0.1); }
+        .energy-gradient { background: linear-gradient(135deg, #059669 0%, #0d9488 100%); }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            400: '#34d399',
+                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857',
+                            800: '#065f46',
+                            900: '#064e3b',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-slate-50 text-slate-900 leading-relaxed relative">
+
+    <!-- 로그인 모달 -->
+    <div id="loginModal" class="fixed inset-0 z-[200] bg-slate-900 flex items-center justify-center p-4">
+        <div class="absolute inset-0 opacity-20 pointer-events-none">
+            <img src="https://images.unsplash.com/photo-1508514177221-188b1cf16e9d?auto=format&fit=crop&w=1200&q=80" alt="bg" class="w-full h-full object-cover">
+        </div>
+        <div class="bg-white rounded-[2rem] p-8 max-w-sm w-full shadow-2xl relative overflow-hidden z-10 animate-in zoom-in-95 duration-500">
+            <div class="text-center mb-8">
+                <div class="bg-brand-500 text-white w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-4 text-xl shadow-lg shadow-brand-500/30">
+                    <i class="fa-solid fa-leaf"></i>
+                </div>
+                <h2 class="text-2xl font-black tracking-tighter text-slate-900">NEO 2026 B2B</h2>
+                <p class="text-xs font-bold text-slate-400 mt-2">안전한 매칭을 위한 파트너 로그인</p>
+            </div>
+
+            <!-- Step 1: 사업자 번호 입력 -->
+            <div id="loginStep1" class="space-y-5">
+                <div>
+                    <label class="text-[10px] font-black text-slate-400 uppercase ml-1">사업자 등록번호 뒷 5자리</label>
+                    <input type="text" id="loginBizNum" maxlength="5" placeholder="예: 12345" class="w-full px-5 py-4 rounded-xl border-2 border-slate-100 focus:border-brand-500 outline-none font-black text-xl text-center tracking-[0.5em] transition-colors mt-1" onkeypress="if(event.key === 'Enter') handleLoginStep1()">
+                </div>
+                <button type="button" onclick="handleLoginStep1()" class="w-full energy-gradient text-white py-4 rounded-xl font-black text-lg hover:opacity-90 shadow-lg shadow-brand-500/30 transition-all">다음 단계</button>
+            </div>
+
+            <!-- Step 2: 중복 기업 선택 (숨김) -->
+            <div id="loginStep2" class="space-y-4 hidden animate-in slide-in-from-right-4">
+                <p class="text-xs font-bold text-brand-600 mb-2 text-center bg-brand-50 p-2 rounded-lg">해당 번호의 기업이 여러 개 확인되었습니다.<br>소속 기업을 선택해주세요.</p>
+                <div id="duplicateCompanyList" class="space-y-2 max-h-48 overflow-y-auto no-scrollbar">
+                </div>
+                <button type="button" onclick="backToStep1()" class="w-full bg-slate-100 text-slate-500 py-3 rounded-xl font-bold text-sm hover:bg-slate-200 transition-all mt-2">뒤로 가기</button>
+            </div>
+
+            <!-- Step 3: 담당자명 입력 (숨김) -->
+            <div id="loginStep3" class="space-y-5 hidden animate-in slide-in-from-right-4">
+                <div class="bg-brand-50 p-4 rounded-xl text-center border border-brand-100">
+                    <p class="text-[10px] font-black text-brand-600 uppercase mb-1">인증된 기업명</p>
+                    <p id="confirmCompanyName" class="font-black text-slate-800 text-lg"></p>
+                </div>
+                <div>
+                    <label class="text-[10px] font-black text-slate-400 uppercase ml-1">담당자 성함 및 직급</label>
+                    <input type="text" id="loginManager" placeholder="예: 홍길동 과장" class="w-full px-5 py-4 rounded-xl border-2 border-slate-100 focus:border-brand-500 outline-none font-bold text-base transition-colors mt-1" onkeypress="if(event.key === 'Enter') handleLoginFinal()">
+                </div>
+                <button type="button" onclick="handleLoginFinal()" class="w-full bg-slate-900 text-white py-4 rounded-xl font-black text-lg hover:bg-black shadow-xl transition-all">시스템 접속하기</button>
+                <button type="button" onclick="backToStep1()" class="w-full bg-transparent text-slate-400 py-2 rounded-xl font-bold text-xs hover:text-slate-600 transition-all underline underline-offset-2">처음부터 다시하기</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 내역 확인 모달 -->
+    <div id="checkModal" class="fixed inset-0 z-[100] hidden flex items-start justify-center p-4 pt-20">
+        <div class="absolute inset-0 bg-slate-950/90 backdrop-blur-md" onclick="closeCheckModal()"></div>
+        <div class="relative bg-white w-full max-w-lg rounded-[3rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 border border-brand-500/20">
+            <div class="bg-slate-900 p-8 text-white flex justify-between items-center">
+                <h3 class="text-xl font-black tracking-tighter flex items-center gap-2"><i class="fa-solid fa-bolt text-brand-500"></i> 나의 신청 내역</h3>
+                <button onclick="closeCheckModal()" class="opacity-50 hover:opacity-100 transition-opacity"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <div class="p-8">
+                <div class="bg-brand-50 p-5 rounded-2xl mb-6 border border-brand-100 flex justify-between items-center">
+                    <div>
+                        <div class="text-[10px] font-black text-brand-600 uppercase tracking-widest">신청 기업</div>
+                        <div class="text-sm font-black text-slate-800 mt-1" id="checkCompanyDisplay"></div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-[10px] font-black text-brand-600 uppercase tracking-widest">담당자</div>
+                        <div class="text-sm font-black text-slate-800 mt-1" id="checkManagerDisplay"></div>
+                    </div>
+                </div>
+
+                <div id="checkResult" class="space-y-3 max-h-60 overflow-y-auto no-scrollbar min-h-[150px]">
+                </div>
+
+                <button onclick="fetchMyApplications()" class="w-full mt-4 border border-slate-200 text-slate-600 bg-white py-3 rounded-xl font-bold text-sm hover:bg-slate-50 transition-all"><i class="fa-solid fa-rotate-right mr-1"></i> 새로고침</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 가이드 모달 -->
+    <div id="guideModal" class="fixed inset-0 z-[100] hidden flex items-start justify-center p-4 sm:p-6 pt-20">
+        <div class="absolute inset-0 bg-slate-950/80 backdrop-blur-sm" onclick="closeGuide()"></div>
+        <div class="relative bg-white w-full max-w-5xl max-h-[90vh] overflow-y-auto rounded-[2.5rem] shadow-2xl flex flex-col no-scrollbar border border-white/10 animate-in zoom-in-95 duration-300">
+            <div class="bg-slate-900 text-white p-8 text-center relative">
+                <button onclick="closeGuide()" class="absolute top-6 right-6 text-white/50 hover:text-white transition-colors">
+                    <i class="fa-solid fa-xmark text-2xl"></i>
+                </button>
+                <div class="bg-brand-600 text-white px-3 py-1 rounded w-fit mx-auto font-black text-[10px] mb-3 tracking-widest uppercase">NEO 2026</div>
+                <h2 class="text-2xl md:text-3xl font-black tracking-tighter">2026 뉴에너지 페어 오송 이용 가이드</h2>
+            </div>
+            
+            <div class="p-8 md:p-12 space-y-12">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <div class="flex flex-col items-center text-center space-y-4">
+                        <div class="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center text-xl font-black shadow-inner text-brand-600"><i class="fa-solid fa-magnifying-glass"></i></div>
+                        <h4 class="font-black text-lg text-slate-900">참여 기업 탐색</h4>
+                        <p class="text-xs text-slate-500 font-medium leading-relaxed">기업명, 관심 기술, 국가를 통해<br>다양한 해외 바이어를 검색하세요.</p>
+                    </div>
+                    <div class="flex flex-col items-center text-center space-y-4">
+                        <div class="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center text-xl font-black shadow-inner text-brand-600"><i class="fa-regular fa-file-lines"></i></div>
+                        <h4 class="font-black text-lg text-slate-900">상세 정보 열람</h4>
+                        <p class="text-xs text-slate-500 font-medium leading-relaxed">기업 카드를 클릭해<br><span class="text-brand-600 font-bold">도입 희망 기술 및 전략</span>을 확인하세요.</p>
+                    </div>
+                    <div class="flex flex-col items-center text-center space-y-4">
+                        <div class="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center text-xl font-black shadow-inner text-brand-600"><i class="fa-solid fa-handshake"></i></div>
+                        <h4 class="font-black text-lg text-slate-900">미팅 신청 및 취소</h4>
+                        <p class="text-xs text-slate-500 font-medium leading-relaxed">기업 정보 및 담당자 확인 과정 없이<br><span class="text-brand-600 font-bold">원클릭 미팅 신청</span>이 가능합니다.</p>
+                    </div>
+                    <div class="flex flex-col items-center text-center space-y-4">
+                        <div class="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center text-xl font-black shadow-inner border border-brand-100 text-brand-600"><i class="fa-solid fa-list-check"></i></div>
+                        <h4 class="font-black text-lg text-slate-900">내역 실시간 확인</h4>
+                        <p class="text-xs text-slate-500 font-medium leading-relaxed">상단 <span class="text-brand-600 font-bold">[내 내역 확인]</span> 메뉴에서<br>신청된 스케줄을 즉시 조회하세요.</p>
+                    </div>
+                </div>
+
+                <div class="bg-brand-50 p-6 rounded-[2rem] border-2 border-dashed border-brand-200 flex gap-4 items-start">
+                    <i class="fa-solid fa-circle-info text-brand-600 mt-1"></i>
+                    <p class="text-xs text-slate-600 font-medium leading-relaxed">
+                        신청 및 취소는 시스템에 실시간 기록됩니다. 배정된 시간표를 변경하려면 반드시 기존 내역을 <strong>[매칭 취소 요청]</strong>으로 변경 제출 후 새로 신청해 주세요.
+                    </p>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <button onclick="closeGuide()" class="flex-1 bg-slate-950 text-white py-5 rounded-2xl font-black text-lg hover:bg-black transition-all">가이드 닫기</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 헤더 영역 -->
+    <header class="bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="bg-slate-900 text-white px-3 py-1 rounded font-black text-lg tracking-tighter flex items-center gap-2">
+                    <i class="fa-solid fa-leaf text-brand-400"></i> NEO 2026
+                </div>
+                <div class="h-5 w-[1px] bg-slate-200"></div>
+                <!-- 로그인된 사용자 정보 표시 영역 -->
+                <div id="loggedInInfo" class="hidden text-[10px] sm:text-xs font-black bg-brand-50 text-brand-700 px-3 py-1.5 rounded-full border border-brand-100">
+                </div>
+            </div>
+            <div class="flex gap-1.5 sm:gap-3 items-center">
+                <a href="https://sites.google.com/koreabridging.com/bridging-translator/%ED%99%88" target="_blank" class="text-[10px] font-black text-white energy-gradient hover:opacity-90 transition-colors flex items-center gap-1.5 px-3 py-1.5 rounded-full shadow-md whitespace-nowrap">
+                    <i class="fa-regular fa-calendar-check"></i> <span class="hidden sm:inline">나의</span> 일정표 확인<span class="hidden sm:inline">하기</span>
+                </a>
+                <button onclick="openCheckModal()" class="text-[10px] font-black text-slate-600 hover:text-brand-600 hover:bg-brand-50 transition-colors flex items-center gap-1.5 border-2 border-slate-100 hover:border-brand-200 px-3 py-1.5 rounded-full bg-white whitespace-nowrap">
+                    <i class="fa-solid fa-magnifying-glass"></i> 내 내역<span class="hidden sm:inline"> 실시간 조회</span>
+                </button>
+                <button onclick="openGuide()" class="text-[10px] font-black text-slate-400 hover:text-slate-800 transition-colors flex items-center gap-1.5 border border-slate-200 px-3 py-1.5 rounded-full bg-white whitespace-nowrap hidden sm:flex">
+                    <i class="fa-solid fa-circle-question"></i> 이용 안내
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <section class="relative bg-slate-900 text-white py-20 px-6 text-center overflow-hidden">
+        <div class="absolute inset-0 opacity-40">
+            <img src="https://images.unsplash.com/photo-1508514177221-188b1cf16e9d?auto=format&fit=crop&w=1200&q=80" alt="Solar Panels and Renewable Energy" class="w-full h-full object-cover">
+        </div>
+        <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/60 to-transparent"></div>
+        <div class="relative z-10 max-w-4xl mx-auto">
+            <div class="inline-block bg-brand-500/20 text-brand-300 border border-brand-400/30 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest mb-6 backdrop-blur-sm">
+                Global B2B Business Matching
+            </div>
+            <h1 class="text-4xl md:text-6xl font-black mb-4 tracking-tighter">NEO 2026 <br class="sm:hidden"> 해외 바이어 디렉토리</h1>
+            <p class="text-lg md:text-xl text-slate-300 font-medium mb-10">성공적인 친환경 파트너십을 위한 글로벌 에너지 기업 심층 분석 보고서</p>
+            <div class="flex flex-wrap justify-center gap-3 text-xs font-bold">
+                <span class="bg-white/10 backdrop-blur-md px-5 py-2.5 rounded-full border border-white/20 flex items-center gap-2"><i class="fa-regular fa-calendar"></i> 2026. 07. 08 - 10</span>
+                <span class="energy-gradient px-5 py-2.5 rounded-full shadow-lg shadow-brand-500/20 flex items-center gap-2"><i class="fa-solid fa-location-dot"></i> OSCO </span>
+            </div>
+        </div>
+    </section>
+
+    <div class="max-w-7xl mx-auto px-4 mt-12">
+        <div class="flex flex-col gap-6 border-b border-slate-200 pb-8">
+            <div class="relative w-full">
+                <i class="fa-solid fa-search absolute left-5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                <input type="text" id="searchInput" onkeyup="filterBuyers()" placeholder="기업명, 관심 기술(ESS, 태양광), 국가 검색..." class="w-full pl-12 pr-6 py-4 rounded-2xl border-2 border-slate-200 focus:outline-none focus:border-brand-500 text-sm font-bold shadow-sm transition-colors">
+            </div>
+            
+            <div class="flex flex-wrap gap-2" id="filterContainer">
+                <button onclick="setFilter('전체', this)" class="filter-btn px-5 py-2 rounded-full text-sm font-black transition-all bg-brand-600 text-white shadow-md">전체 기업</button>
+                <button onclick="setFilter('ESS', this)" class="filter-btn px-5 py-2 rounded-full text-sm font-black transition-all bg-white text-slate-500 border border-slate-200 hover:border-brand-500 hover:text-brand-600">ESS (에너지저장)</button>
+                <button onclick="setFilter('태양열 패널', this)" class="filter-btn px-5 py-2 rounded-full text-sm font-black transition-all bg-white text-slate-500 border border-slate-200 hover:border-brand-500 hover:text-brand-600">태양열·태양광</button>
+                <button onclick="setFilter('수소', this)" class="filter-btn px-5 py-2 rounded-full text-sm font-black transition-all bg-white text-slate-500 border border-slate-200 hover:border-brand-500 hover:text-brand-600">수소 에너지</button>
+                <button onclick="setFilter('부품', this)" class="filter-btn px-5 py-2 rounded-full text-sm font-black transition-all bg-white text-slate-500 border border-slate-200 hover:border-brand-500 hover:text-brand-600">부품 및 장비</button>
+            </div>
+        </div>
+    </div>
+
+    <main class="max-w-7xl mx-auto px-4 py-12">
+        <div id="buyerGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"></div>
+    </main>
+
+    <!-- 상세정보 모달 -->
+    <div id="modal" class="fixed inset-0 z-50 hidden flex items-start justify-center p-4 sm:p-8 pt-20">
+        <div class="absolute inset-0 bg-slate-950/90 backdrop-blur-md" onclick="closeModal()"></div>
+        <div class="relative bg-white w-full max-w-3xl max-h-[92vh] overflow-y-auto rounded-[3rem] shadow-2xl flex flex-col no-scrollbar border border-white/10 animate-in zoom-in-95 duration-300">
+            <div class="p-8 sm:p-12 sticky top-0 bg-white/95 backdrop-blur-sm border-b z-10 flex justify-between items-start gap-4">
+                <div id="modalHeader" class="flex-1 w-full"></div>
+                <button onclick="closeModal()" class="p-3 hover:bg-slate-100 rounded-full transition-all group shrink-0 -mr-3 -mt-3">
+                    <i class="fa-solid fa-xmark text-3xl text-slate-300 group-hover:text-slate-900"></i>
+                </button>
+            </div>
+            <div id="modalBody" class="p-8 sm:p-12"></div>
+        </div>
+    </div>
+
+    <script>
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz7g6IVSuqGnGQm4bn6zDV5QqpbXZJcRnJSwZCULB1DF6-jpqB9pltqm1W1HtXq29Rh/exec";
+        
+        let selectedBuyer = null;
+        let currentFilter = '전체';
+
+        // 세션 데이터
+        let loggedInCompany = null;
+        let loggedInManager = null;
+        let tempSelectedCompany = null;
+
+        // 기업 사업자 등록번호 데이터 (실제 데이터 적용 완료)
+        const korCompanies = [
+            {name: "성창 주식회사", num: "32849"},
+            {name: "(주)큐에스에프", num: "02679"},
+            {name: "(주)우앤이", num: "88790"},
+            {name: "(주) 투씨디", num: "02162"},
+            {name: "(주)오주산업", num: "96611"},
+            {name: "주식회사 에너지온", num: "02838"},
+            {name: "주식회사경인", num: "00402"},
+            {name: "아진솔라텍주식회사", num: "00792"},
+            {name: "제이엔케이글로벌", num: "69870"},
+            {name: "한국가스안전공사", num: "02018"},
+            {name: "금강전기산업(주)", num: "12646"},
+            {name: "블루스파크", num: "11111"},
+            {name: "티에스이", num: "34925"},
+            {name: "원익머트리얼즈", num: "02448"},
+            {name: "주식회사 메스코리아", num: "93359"},
+            {name: "(주)코본테크", num: "02550"},
+            {name: "(주)에어레인", num: "55816"},
+            {name: "케이지에이(주)", num: "00919"},
+            {name: "주식회사 케이블컴퍼니", num: "96878"},
+            {name: "썬스코 주식회사", num: "02301"},
+            {name: "가원플래너", num: "53689"},
+            {name: "주식회사 친환경에너지센터", num: "03254"},
+            {name: "한국에너지공단 세종충북지역본부", num: "00951"},
+            {name: "(사)한국태양광공사협회", num: "00172"},
+            {name: "(주)원터치", num: "89642"},
+            {name: "(주)태강기업", num: "05921"},
+            {name: "한국전력공사", num: "00052"},
+            {name: "(주)에이치에스쏠라에너지", num: "37765"},
+            {name: "대연씨앤아이", num: "49502"},
+            {name: "충북테크노파크", num: "13840"},
+            {name: "청주기상지청", num: "00088"},
+            {name: "(주)와이엠텍", num: "76983"},
+            {name: "주식회사 안세", num: "56239"},
+            {name: "주식회사 다솔", num: "68738"},
+            {name: "(주)데이지솔라", num: "30903"},
+            {name: "사단기업 고등기술연구원 충청캠퍼스", num: "02842"},
+            {name: "주식회사 디시오", num: "02166"},
+            {name: "(주)에이치투넷", num: "02418"},
+            {name: "현대자동차", num: "09147"},
+            {name: "엔지니어링공제조합", num: "01901"},
+            {name: "국립한국교통대학교 RISE사업단", num: "06821"},
+            {name: "조일성업전기(주)", num: "04832"},
+            {name: "(주)바이오프랜즈", num: "00453"},
+            {name: "한국무역보험공사", num: "06816"},
+            {name: "(주)SR에너지", num: "50009"},
+            {name: "충청에너지서비스", num: "01647"},
+            {name: "주식회사에스아이시스템", num: "02894"},
+            {name: "(주)하나유니트", num: "59375"},
+            {name: "충남지역산업진흥원", num: "66318"},
+            {name: "(주)제아이엔지", num: "00919"},
+            {name: "한국ESS산업진흥회", num: "70254"},
+            {name: "주식회사 이안이엔지", num: "46527"},
+            {name: "한국건설생활환경시험연구원", num: "07375"},
+            {name: "한국세라믹기술원", num: "06696"},
+            {name: "주식회사 이프", num: "01472"},
+            {name: "주식회사 그랜드썬기술단", num: "10941"},
+            {name: "(주)쎄이프티솔라텍", num: "02767"},
+            {name: "사단법인 한국태양광산업협회", num: "16563"},
+            {name: "(주)한국가스기술공사", num: "08704"},
+            {name: "한국전력정보", num: "01038"},
+            {name: "이플랜 유한회사", num: "00335"},
+            {name: "한국수소환경협회", num: "09626"},
+            {name: "한국에너지기술연구원", num: "02242"},
+            {name: "한국수자원공사", num: "00471"},
+            {name: "한국환경산업기술원", num: "13846"},
+            {name: "(재)충북지역산업진흥원", num: "00025"},
+            {name: "주식회사 디에스에코전기", num: "00025"},
+            {name: "(주)원지이엔씨", num: "00818"},
+            {name: "광주지역산업진흥원", num: "15201"},
+            {name: "한국소켓센타", num: "00354"},
+            {name: "주식회사 유트론", num: "00324"},
+            {name: "한양대학교에리카사업단", num: "10205"},
+            {name: "주식회사 다산에너지", num: "53230"}
+        ];
+
+        const buyers = [
+            { id: 'c01', name: 'PT Carsurin Tbk', type: '친환경 검증 및 유통 기관', icon: 'fa-microscope', website: 'https://carsurin.com/', desc: '인도네시아 최대 친환경 검증/ 유통 기관. 전력 소모가 막대한 17개 첨단 실험실과 배터리 시험소를 운영하고 있으며, 인도네시아 내 친환경 에너지 확보에 높은 관심을 두고 있습니다.', items: '태양열 패널, 리튬배터리 전용 보관함, 무전원 배터리 침수 보관함, 전원공급장치, ESS 제조·시험 장비', strategy: '자사 배터리 시험소 및 친환경 실험실에 즉각 도입할 수 있는 안전·검증 설비를 도입하고자 합니다.', date: '7/08(수) 참석', koreaHistory: '한국과 거래 이력 있음', table: '1', country: 'Indonesia', manager: 'Eko Alexander', established: '1968', employees: '100명 이상', revenue: 'USD 10,000,000 이상' },
+            { id: 'c02', name: 'INNOPOWER COMPANY LIMITED', type: '국가 주도 에너지 전환 기업', icon: 'fa-bolt', website: 'https://www.innopower.co.th', desc: '국가 차원의 에너지 전환과 탈탄소화 이니셔티브를 적극적으로 지원하는 태국 소재 자회사. 청정에너지 시장 개발 및 글로벌 협력을 통해 재생에너지 및 저탄소 비즈니스에 집중합니다.', items: '신재생에너지 전반 (태양열 패널, ESS, 수소, 부품 등 모든 기업 미팅 가능)', strategy: '태국 시장 환경에 특화된 재생에너지 기술 발전을 가속화하고 새로운 저탄소 비즈니스 기회 발굴에 주력합니다.', date: '7/08(수) 참석', koreaHistory: '한국과 거래 이력 없음', table: '2', country: 'Thailand', manager: 'Kitiya Tavorn', established: '2022', employees: '30-50명', revenue: 'USD 5,000,000 ~ USD 10,000,000' },
+            { id: 'c03', name: 'PT CCEPC Indonesia', type: '글로벌 EPC(설계·조달·시공) 기업', icon: 'fa-industry', website: 'https://www.instagram.com/p/DSXWqxikzYH/?igsh=MWp1dTN4bmN4bnhoaA==', desc: '인도네시아 자카르타에 설립되어 친환경 발전 기술, 산업 단지 조성, 인프라 및 토목 건설을 전문으로 하는 기업. 웨다베이 및 모로왈리 주요 산업 단지 내 대규모 발전소와 폐기물 에너지화 시설 구축을 수행했습니다.', items: '신재생에너지 전반 (태양열 패널, ESS, 수소, 부품 등 모든 기업 미팅 가능)', strategy: '웨다베이 및 모로왈리 등 주요 산업 단지 내 대규모 발전소와 폐기물 에너지화 시설(WTE) 구축에 협력하고자 합니다.', date: '7/08(수) 참석', koreaHistory: '한국과 거래 이력 없음', table: '3', country: 'Indonesia', manager: 'Hendri Susanto', established: '2024', employees: '50-100명', revenue: 'USD 10,000,000 이상' },
+            { id: 'c04', name: 'Ideal Energy Solutions Private Limited', type: '주택 에너지 효율 전문 기업', icon: 'fa-house-chimney-window', website: 'www.idealenergysolutions.org', desc: '영국 소재 주택 에너지 효율 개선 및 ECO 전문 설치 기업. 정부 보조금 기반 단열·난방 시스템 설치, 에너지 절감 솔루션과 함께 보조금 신청 프로세스 가이드 및 원스톱 고품질 설치 서비스를 제공합니다.', items: '신재생에너지 전반 (태양열 패널, ESS, 수소, 부품 등 모든 기업 미팅 가능)', strategy: '영국 주거 환경의 에너지 효율을 극대화할 수 있는 혁신적인 스마트 홈 난방 및 절감 자재를 소싱하고자 합니다.', date: '7/08(수) 참석', koreaHistory: '한국과 거래 이력 없음', table: '4', country: 'United Kingdom', manager: 'Ali Raza', established: '2024', employees: '30-50명', revenue: 'USD 500,000 ~ USD 1,000,000' },
+            { id: 'c05', name: 'Ecological Systems', type: '태양열 시스템 시공 기업', icon: 'fa-solar-panel', website: 'https://www.njsolarenergysolutions.com/', desc: '미국 뉴저지 태양광 에너지 시스템 시공 기업. NABCEP 인증을 획득하고 설치, 부품, 유지보수에 대한 25년 보증을 제공하며, 뉴저지 및 펜실베이니아 면허를 보유한 전기 및 주택 개조 전문업체입니다.', items: '태양열 패널, 태양광 부품 및 장비', strategy: '시공 단가를 낮추면서도 25년 보증을 충족시킬 수 있는 내구성 높은 한국산 태양열 패널 및 시스템 부품을 직접 수입하고자 합니다.', date: '7/08(수) 참석', koreaHistory: '한국과 거래 이력 있음', table: '5', country: 'USA', manager: 'Robert James Mc Hugh', established: '업력 29년', employees: '50-100명', revenue: 'USD 5,000,000 ~ USD 10,000,000' },
+            { id: 'c06', name: 'Fourcell Energy Pvt. Ltd.', type: '재생 에너지 솔루션 전문', icon: 'fa-solar-panel', website: 'https://fourcellenergy.com', desc: '인도 기반의 태양광 발전 시스템 및 재생 에너지 솔루션 전문 기업. 주거용, 상업용, 산업용 시설을 위한 태양광 EPC 서비스 제공 및 고효율 태양광 패널 등 관련 장비를 공급합니다.', items: '태양열 패널, ESS (에너지저장장치)', strategy: '혁신적인 태양광 기술과 현장 맞춤형 솔루션을 제공하여 실질적인 에너지 비용 절감과 탄소 배출 저감에 기여하고자 합니다.', date: '7/08(수) 참석', koreaHistory: '한국과 거래 이력 없음', table: '6', country: 'India', manager: 'CHAITANYA NANDA', established: '2020', employees: '50-100명', revenue: 'USD 5,000,000 ~ USD 10,000,000' },
+            { id: 'c07', name: 'MEGEX Co., Ltd.', type: '산업 계측기 및 솔루션 공급', icon: 'fa-display', website: 'www.megex.co.th', desc: '태국의 선도적인 산업용 계측기, 가스 분석기, 기계 부품 공급 기업. SHINKAWA, Siemens 등 세계 최고 수준의 벤더 제품을 기반으로 발전, 석유·가스 등 다양한 산업군에 맞춤형 솔루션을 제공합니다.', items: 'ESS (에너지저장장치), 계측 부품 및 장비', strategy: '100년 이상의 결합된 산업 경험을 갖춘 전문가 팀이 고객사의 넷제로(Net-zero) 및 탄소 중립 목표 달성을 지원합니다.', date: '7/08(수) 참석', koreaHistory: '한국과 거래 이력 있음', table: '7', country: 'Thailand', manager: 'Mr. Chanwit Koomchokpaisarn', established: '2016', employees: '30-50명', revenue: 'USD 1,000,000 ~ USD 5,000,000' },
+            { id: 'c08', name: 'JNT technology Co., Ltd.', type: '전문 비즈니스 파트너', icon: 'fa-handshake', website: 'http://www.jnt-tech.tw/sub2/sub1.html', desc: '반도체 및 조선·해양 산업을 기반으로 탄탄하게 성장해 온 대만의 전문 비즈니스 파트너. 태양광 및 풍력 발전 비중이 높은 대만의 에너지 전환 트렌드에 발맞춰 한국 중소기업의 현지 진출을 돕습니다.', items: '신재생에너지 전반 (태양열 패널, ESS, 수소, 부품 등 모든 기업 미팅 가능)', strategy: '신재생 에너지 분야에서 경쟁력 있는 한국 기업들을 발굴하여 대만 내 수출 기회와 연결하고 글로벌 파트너십 가교 역할을 수행합니다.', date: '7/08(수) 참석', koreaHistory: '한국과 거래 이력 있음', table: '8', country: 'Taiwan', manager: 'KIM, GAHWA', established: '2011', employees: '30-50명', revenue: 'USD 1,000,000 ~ USD 5,000,000' },
+            { id: 'c09', name: 'FECON', type: '글로벌 엔지니어링 그룹', icon: 'fa-city', website: 'WWW.FECON.COM.VN', desc: '신재생 에너지 플랜트, 친환경 녹색 도시 등 글로벌 지속 가능 인프라 개발을 선도하는 베트남 대표 엔지니어링 그룹. 풍력·태양광 등 에너지 공사 총괄 시공, 합작 투자 기반의 인프라 투자를 주도합니다.', items: '태양열 패널, ESS 기업, 전력 부품', strategy: '압도적인 기술 전문성과 탄탄한 재무 구조를 바탕으로 한 무결성(Integrity)과 혁신으로, 지속 가능한 파트너를 모색합니다.', date: '7/08(수) 참석', koreaHistory: '한국과 거래 이력 있음', table: '9', country: 'Vietnam', manager: 'DO BAO VU', established: '2004', employees: '100명 이상', revenue: 'USD 10,000,000 이상' },
+            { id: 'c10', name: 'Santes Incinerator A.S', type: '환경·에너지 엔지니어링 기업', icon: 'fa-recycle', website: 'santes.com.tr', desc: '4개 대륙에 수출하는 터키 선도 환경·에너지 엔지니어링 기업. 폐기물 소각 시스템 제조사로, NEO 2026을 통해 소각 효율을 높일 한국의 고효율 신재생 기자재 및 배기가스 저감 기술 도입을 추진합니다.', items: 'ESS (에너지저장장치), 태양열 패널, 친환경 부품', strategy: '한국의 우수한 친환경 기술을 글로벌 제조 인프라와 결합하여 유럽·중동·아프리카 시장 진출의 가교 역할을 수행하고자 합니다.', date: '7/08(수) 참석', koreaHistory: '한국과 거래 이력 있음', table: '10', country: 'Turkey', manager: 'Erkan ŞANAL', established: '1990', employees: '30-50명', revenue: 'USD 1,000,000 ~ USD 5,000,000' },
+            { id: 'c11', name: 'HCS', type: '신재생에너지·수처리 기업', icon: 'fa-water', website: 'www.hcs.mn', desc: '몽골 최초 지열 히트펌프 도입 및 LG 협력 경력을 가진 신재생에너지·수처리 유력 기업. 몽골 내 수처리 시스템 전력 효율화를 위해 한국산 태양광(Solar) 및 에너지 저장 장치(ESS) 구매를 추진합니다.', items: 'ESS (에너지저장장치), 태양열 패널', strategy: '확고한 직접 구매 수요를 바탕으로, 국내 우수 신재생에너지 기업에 몽골 인프라 시장으로의 실질적인 수출 기회를 제공하고자 합니다.', date: '7/08(수) 참석', koreaHistory: '한국과 거래 이력 있음', table: '11', country: 'Mongolia', manager: 'Enkhbayar Jargalsaikhan', established: '2007', employees: '30-50명', revenue: 'USD 1,000,000 ~ USD 5,000,000' },
+            { id: 'c12', name: 'NST POWERTECH SDN BHD', type: '전기 유통 및 에너지 서비스', icon: 'fa-plug', website: '홈페이지 보수중', desc: '말레이시아 기반의 전기 기자재 유통 및 신재생에너지 서비스 전문 기업. 태양광 배터리, 조명, UPS 솔루션을 공급하며 동남아 시장에 유통할 한국산 고성능 태양광/ESS 솔루션을 소싱합니다.', items: '수소, ESS (에너지저장장치), 태양열 부품', strategy: '우수한 기술력을 가진 한국 제품을 발굴하여 급성장하는 말레이시아 전력 인프라 시장과의 비즈니스 연결고리 역할을 수행합니다.', date: '7/08(수) 참석', koreaHistory: '한국과 거래 이력 있음', table: '12', country: 'Malaysia', manager: 'WAN NORSHAZANA BINTI WAN ZULKIFLI', established: '2018', employees: '10-30명', revenue: 'USD 500,000 ~ USD 1,000,000' },
+            { id: 'c13', name: 'KENCANA JAYAMAS SDN BHD', type: '전력·전기 설비 전문', icon: 'fa-battery-half', website: 'https://kencanajayamas.com/', desc: 'UPS, 배터리, 릴레이 분야에서 탄탄한 실적을 보유한 말레이시아 전력·전기 설비 기업. 산업 단지 내 전력 효율화를 위한 대용량 ESS 도입 및 태양광 발전 연계 전력 제어 사업 다각화를 모색합니다.', items: '신재생에너지 전반 (태양열 패널, ESS, 수소, 부품 등 모든 기업 미팅 가능)', strategy: '선진 ESS 배터리 기술 및 수소·태양열 솔루션 기업에게 말레이시아 직접 납품 및 기술 교류 기회를 제공하는 핵심 바이어입니다.', date: '7/08(수) 참석', koreaHistory: '한국과 거래 이력 없음', table: '13', country: 'Malaysia', manager: 'RUHAIZA BINTI AHMAD', established: '2007', employees: '30-50명', revenue: 'USD 1,000,000 ~ USD 5,000,000' },
+            { id: 'c14', name: 'PhoenixEV', type: '전기차 브랜드 및 제조', icon: 'fa-truck-fast', website: 'phoenixev.ai', desc: '미국 소재 전기차 브랜드로 제조 기반을 통해 중형 트럭부터 대형 버스를 취급합니다. 자사 제품의 충전 인프라 및 에너지 공급/배터리 보관 솔루션을 탐색 중입니다.', items: '태양열 패널, 배터리 전용 보관함, 전원공급장치, ESS 제조·시험 설비', strategy: '전기차 생산 라인과 충전망에 적용할 안정적이고 효율적인 인프라 장비, 전원 공급 솔루션을 발굴하여 사업을 고도화하고자 합니다.', date: '7/08(수) 참석', koreaHistory: '한국과 거래 이력 없음', table: '14', country: 'USA', manager: 'Lewis Wei Liu', established: '2003', employees: '100명 이상', revenue: 'USD 10,000,000 이상' },
+            { id: 'c15', name: 'RP Tech Energy Sdn Bhd', type: '토탈 파워 솔루션 전문', icon: 'fa-lightbulb', website: 'www.rptechenergy.com', desc: '말레이시아 기반의 토탈 파워 솔루션 전문 기업. 오일/가스, 석유화학, 철도 등 다양한 산업군에 엔지니어링 자문, 장비 공급/설치, 유지보수를 아우르는 종합 인프라 서비스를 제공합니다.', items: '신재생에너지 전반 (태양열 패널, ESS, 수소, 부품 등 모든 기업 미팅 가능)', strategy: '핵심 산업 인프라에 최적화된 전력 솔루션을 도입하고 파트너 기업과의 협력을 통해 지속 가능한 발전을 실현하고자 합니다.', date: '7/08(수) 참석', koreaHistory: '한국과 거래 이력 있음', table: '15', country: 'Malaysia', manager: 'Muhammad Nur Rahami Bin Rosli', established: '2023', employees: '30-50명', revenue: 'USD 1,000,000 ~ USD 5,000,000' },
+            { id: 'c16', name: 'FuelCellChina', type: '수소 제품 E-commerce 전문', icon: 'fa-store', website: 'www.fuelcellchina.com', desc: '중국 소재의 수소 제품 E-commerce 전문 운영 기업. 수소 제품의 공급과 수요를 이어주는 전문 플랫폼을 운영하며, 홈페이지를 통한 실제 거래 활성화에 중점을 둡니다.', items: '수소 에너지 기기 및 시스템 부품', strategy: '중국 진출을 희망하는 국내기업에게 낮은 비용, 낮은 진입 장벽으로 효과적인 마켓 진출 솔루션을 제공합니다.', date: '7/08(수) 참석', koreaHistory: '한국과 거래 이력 있음', table: '16', country: 'China', manager: 'Chen Wei', established: '2020', employees: '10-30명', revenue: 'USD 500,000 ~ USD 1,000,000' },
+            { id: 'c17', name: 'EXIS GROUP SDN BHD', type: '에너지 시설 전문 건설기업', icon: 'fa-hard-hat', website: 'https://exisgroup.com.my/', desc: '말레이시아 소재 에너지 관련 건축 전문 건설기업. 수소 인프라, 태양열 에너지 발전 및 에너지 저장 시설(ESS) 인프라 구축을 전문으로 수행하고 있습니다.', items: '신재생에너지 전반 (태양열 패널, ESS, 수소, 부품 등 모든 기업 미팅 가능)', strategy: '수소, 태양열 에너지 발전 및 ESS 인프라 구축에 대한 직접적이고 확실한 수요를 바탕으로 한국의 우수 파트너를 찾습니다.', date: '7/08(수) 참석', koreaHistory: '한국과 거래 이력 있음', table: '17', country: 'Malaysia', manager: 'W MOHD WAFIY BIN W ZAKARIA', established: '2020', employees: '10-30명', revenue: 'USD 1,000,000 ~ USD 5,000,000' },
+            { id: 'c18', name: 'Rifhan Teknologi Sdn Bhd', type: '인프라 구축 및 소싱 기업', icon: 'fa-server', website: 'https://rifhan.com/', desc: '현재 IT 시스템, 인프라, 유지보수 사업을 진행 중이며 이를 확장해 태양열 패널 및 에너지 인프라와 관련된 말레이시아 정부 연계 사업을 주도적으로 진행하고 있습니다.', items: '태양열 패널, 신재생 인프라 솔루션', strategy: '우수한 기술 장비를 말레이시아 수출 기준에 맞추어 수입하고, 이후 로컬 정부사업 연계까지 확장할 수 있도록 협력합니다.', date: '7/08(수) 참석', koreaHistory: '한국과 거래 이력 있음', table: '18', country: 'Malaysia', manager: 'Abdul Hafidz Bin Win', established: '2015', employees: '50-100명', revenue: 'USD 5,000,000 ~ USD 10,000,000' },
+            { id: 'c19', name: 'Adelan', type: '수소 및 연료전지 기술 기업', icon: 'fa-atom', website: 'adelan.co.uk', desc: '영국 버밍엄에 기반을 둔 대표적인 수소 및 연료전지(Fuel Cell) 기술 전문 기업. 탈탄소화를 위한 수소 연료전지 시스템 연구개발, 차세대 솔루션 설계, 제조 및 자문까지 제공합니다.', items: '수소, 연료전지 부품, 친환경 솔루션', strategy: '글로벌 파트너들과의 긴밀한 협력을 통해 고효율 친환경 연료전지를 상용화하고 지속 가능한 생태계 구축에 기여하고자 합니다.', date: '7/08(수) 참석', koreaHistory: '한국과 거래 이력 있음', table: '19', country: 'United Kingdom', manager: 'Dr Michaela Kendall', established: '1996', employees: '10-30명', revenue: 'USD 500,000 ~ USD 1,000,000' },
+            { id: 'c20', name: 'Parliament of Thailand', type: '정부/입법 기관', icon: 'fa-landmark', website: 'www.parliament.go.th', desc: '태국 하원 사무처로, 태국의 국가 기후 변화, 지속 가능성 및 신재생 에너지 정책의 입법과 국가 에너지 프레임워크 구축을 주도하는 핵심 입법 기관입니다.', items: '신재생에너지 전반 (태양열 패널, ESS, 수소, 부품 등 모든 기업 미팅 가능)', strategy: '국가 탈탄소화 목표 실현을 위해, 글로벌 최고 수준의 신재생 에너지 기술을 검증하고 국가적 제도 기반을 마련합니다.', date: '7/08(수) 참석', koreaHistory: '한국과 거래 이력 있음', table: '20', country: 'Thailand', manager: 'Archawin Sitaputra', established: '1932', employees: '100명 이상', revenue: '정부기관, 매출 정보 없음' }
+        ];
+
+        window.onload = function() {
+            // 세션 체크 후 로그인/초기화 분기
+            const sessionCompany = sessionStorage.getItem('neo_company');
+            const sessionManager = sessionStorage.getItem('neo_manager');
+
+            if (sessionCompany && sessionManager) {
+                loggedInCompany = sessionCompany;
+                loggedInManager = sessionManager;
+                document.getElementById('loginModal').classList.add('hidden');
+                initApp();
+            } else {
+                document.body.classList.add('modal-open');
+                document.getElementById('loginBizNum').focus();
+            }
+        };
+
+        // --- 로그인 프로세스 로직 ---
+        function handleLoginStep1() {
+            const num = document.getElementById('loginBizNum').value.trim();
+            if (num.length !== 5) {
+                showToast("사업자 등록번호 뒷 5자리를 정확히 입력해주세요.", "error");
+                return;
+            }
+
+            // 관리자 접속 예외 처리 (백도어)
+            if (num === '20266') {
+                loggedInCompany = "관리자";
+                loggedInManager = "운영팀";
+                sessionStorage.setItem('neo_company', loggedInCompany);
+                sessionStorage.setItem('neo_manager', loggedInManager);
+                
+                document.getElementById('loginModal').classList.add('hidden');
+                document.body.classList.remove('modal-open');
+                initApp();
+                showToast("관리자 권한으로 시스템에 접속되었습니다.", "success");
+                return;
+            }
+
+            const matched = korCompanies.filter(c => c.num === num);
+
+            if (matched.length === 0) {
+                showToast("등록되지 않은 번호입니다. 기업 정보를 확인해주세요.", "error");
+            } else if (matched.length === 1) {
+                tempSelectedCompany = matched[0].name;
+                document.getElementById('confirmCompanyName').innerText = tempSelectedCompany;
+                document.getElementById('loginStep1').classList.add('hidden');
+                document.getElementById('loginStep3').classList.remove('hidden');
+                document.getElementById('loginManager').focus();
+            } else {
+                // 중복된 경우 선택창 렌더링
+                const listDiv = document.getElementById('duplicateCompanyList');
+                listDiv.innerHTML = '';
+                matched.forEach(c => {
+                    const btn = document.createElement('button');
+                    btn.type = 'button'; // 폼 제출 방지 안전장치
+                    btn.className = "w-full text-left px-4 py-3 bg-white border border-brand-200 rounded-xl hover:border-brand-500 hover:bg-brand-50 font-black text-slate-700 transition-all text-sm";
+                    btn.innerText = c.name;
+                    btn.onclick = () => {
+                        tempSelectedCompany = c.name;
+                        document.getElementById('confirmCompanyName').innerText = tempSelectedCompany;
+                        document.getElementById('loginStep2').classList.add('hidden');
+                        document.getElementById('loginStep3').classList.remove('hidden');
+                        document.getElementById('loginManager').focus();
+                    };
+                    listDiv.appendChild(btn);
+                });
+                document.getElementById('loginStep1').classList.add('hidden');
+                document.getElementById('loginStep2').classList.remove('hidden');
+            }
+        }
+
+        function backToStep1() {
+            document.getElementById('loginBizNum').value = '';
+            document.getElementById('loginStep2').classList.add('hidden');
+            document.getElementById('loginStep3').classList.add('hidden');
+            document.getElementById('loginStep1').classList.remove('hidden');
+            document.getElementById('loginBizNum').focus();
+        }
+
+        function handleLoginFinal() {
+            const manager = document.getElementById('loginManager').value.trim();
+            if(!manager) {
+                showToast("담당자 성함을 입력해주세요.", "error");
+                return;
+            }
+            loggedInCompany = tempSelectedCompany;
+            loggedInManager = manager;
+            
+            sessionStorage.setItem('neo_company', loggedInCompany);
+            sessionStorage.setItem('neo_manager', loggedInManager);
+
+            document.getElementById('loginModal').classList.add('hidden');
+            document.body.classList.remove('modal-open');
+            initApp();
+        }
+
+        function initApp() {
+            // 헤더 정보 렌더링
+            const infoDiv = document.getElementById('loggedInInfo');
+            if (loggedInCompany === "관리자") {
+                infoDiv.innerHTML = `<i class="fa-solid fa-shield-halved text-brand-500 mr-1"></i> NEO 2026 ${loggedInCompany} <span class="font-normal opacity-70 ml-1">(${loggedInManager})</span>`;
+            } else {
+                infoDiv.innerHTML = `<i class="fa-regular fa-building text-brand-500 mr-1"></i> ${loggedInCompany} <span class="font-normal opacity-70 ml-1">(${loggedInManager})</span>`;
+            }
+            infoDiv.classList.remove('hidden');
+            
+            renderBuyers();
+            
+            // 최초 로그인 시에만 가이드 오픈
+            if(!sessionStorage.getItem('neo_guide_seen')) {
+                openGuide();
+                sessionStorage.setItem('neo_guide_seen', 'true');
+            }
+        }
+
+        // --- 유틸 로직 ---
+        function showToast(message, type = 'error') {
+            const toast = document.createElement('div');
+            const bgColor = type === 'success' ? 'bg-brand-600' : 'bg-red-500';
+            const icon = type === 'success' ? 'fa-check-circle' : 'fa-circle-exclamation';
+            
+            toast.className = `fixed bottom-6 right-6 z-[250] px-6 py-4 rounded-xl shadow-2xl text-white font-bold text-sm flex items-center gap-3 transition-all duration-300 transform translate-y-10 opacity-0 ${bgColor}`;
+            toast.innerHTML = `<i class="fa-solid ${icon} text-lg"></i> <span>${message}</span>`;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => { toast.classList.remove('translate-y-10', 'opacity-0'); }, 10);
+            
+            setTimeout(() => {
+                toast.classList.add('translate-y-10', 'opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function getCountryCode(countryName) {
+            if (!countryName) return null;
+            const name = countryName.toLowerCase().trim();
+            const map = {
+                'malaysia': 'my', 'indonesia': 'id', 'thailand': 'th',
+                'united kingdom': 'gb', 'uk': 'gb', 'usa': 'us', 'united states': 'us',
+                'india': 'in', 'taiwan': 'tw', 'united arab emirates': 'ae',
+                'viet nam': 'vn', 'vietnam': 'vn', 'turkey': 'tr', 'mongolia': 'mn', 'china': 'cn'
+            };
+            return map[name] || null;
+        }
+
+        // --- 내역 조회 모달 ---
+        function openCheckModal() {
+            document.getElementById('checkModal').classList.remove('hidden');
+            document.body.classList.add('modal-open');
+            document.getElementById('checkCompanyDisplay').innerText = loggedInCompany;
+            document.getElementById('checkManagerDisplay').innerText = loggedInManager;
+            fetchMyApplications();
+        }
+
+        function closeCheckModal() {
+            document.getElementById('checkModal').classList.add('hidden');
+            document.body.classList.remove('modal-open');
+        }
+
+        async function fetchMyApplications() {
+            const resultDiv = document.getElementById('checkResult');
+            resultDiv.innerHTML = '<div class="flex flex-col items-center justify-center py-10"><i class="fa-solid fa-spinner spinner text-brand-500 text-3xl mb-3"></i><p class="text-slate-400 font-bold text-sm">클라우드 서버에서 내역을 불러오는 중...</p></div>';
+
+            try {
+                const response = await fetch(`${SCRIPT_URL}?action=get&company=${encodeURIComponent(loggedInCompany)}&password=${encodeURIComponent(loggedInManager)}`);
+                const data = await response.json();
+
+                if (data.length === 0) {
+                    resultDiv.innerHTML = '<div class="p-8 text-center text-slate-400 font-bold text-sm bg-slate-50 rounded-2xl border border-slate-100">일치하는 신청 내역이 없습니다.</div>';
+                } else {
+                    resultDiv.innerHTML = '';
+                    data.forEach(item => {
+                        resultDiv.innerHTML += `
+                            <div class="p-5 bg-white border border-slate-200 rounded-2xl shadow-sm animate-in fade-in slide-in-from-bottom-2">
+                                <div class="flex justify-between items-start mb-2">
+                                    <p class="text-[10px] font-black text-brand-600 uppercase tracking-wider bg-brand-50 px-2 py-1 rounded border border-brand-100">${item.category}</p>
+                                    <span class="text-[9px] font-bold text-slate-400"><i class="fa-regular fa-clock mr-1"></i>${item.timestamp}</span>
+                                </div>
+                                <h4 class="font-black text-slate-900 text-base leading-tight mt-1">${item.buyerName}</h4>
+                                <div class="flex items-center gap-2 mt-3 text-xs font-bold text-slate-600">
+                                    <i class="fa-solid fa-calendar-check text-brand-500"></i>
+                                    <span>예약 시간: ${item.time}</span>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+            } catch (err) {
+                resultDiv.innerHTML = '<div class="p-6 text-center text-red-500 font-bold text-xs bg-red-50 rounded-2xl">서버 연결 오류입니다. 잠시 후 새로고침을 눌러주세요.</div>';
+            }
+        }
+
+        // --- 기타 UI 로직 ---
+        function openGuide() {
+            document.getElementById('guideModal').classList.remove('hidden');
+            document.body.classList.add('modal-open');
+        }
+
+        function closeGuide() {
+            document.getElementById('guideModal').classList.add('hidden');
+            document.body.classList.remove('modal-open');
+        }
+
+        function setFilter(category, btnElement) {
+            currentFilter = category;
+            const buttons = document.querySelectorAll('.filter-btn');
+            buttons.forEach(btn => { btn.className = "filter-btn px-5 py-2 rounded-full text-sm font-black transition-all bg-white text-slate-500 border border-slate-200 hover:border-brand-500 hover:text-brand-600"; });
+            if (btnElement) { btnElement.className = "filter-btn px-5 py-2 rounded-full text-sm font-black transition-all bg-brand-600 text-white shadow-md"; }
+            renderBuyers();
+        }
+
+        function filterBuyers() { renderBuyers(); }
+
+        function renderBuyers() {
+            const grid = document.getElementById('buyerGrid');
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            grid.innerHTML = '';
+            
+            const filtered = buyers.filter(b => {
+                const searchMatch = b.name.toLowerCase().includes(search) || 
+                    b.type.toLowerCase().includes(search) || 
+                    b.desc.toLowerCase().includes(search) || 
+                    (b.items && b.items.toLowerCase().includes(search)) ||
+                    (b.country && b.country.toLowerCase().includes(search));
+
+                let filterMatch = true;
+                if (currentFilter !== '전체') {
+                    const content = (b.items + " " + b.desc + " " + b.type).toLowerCase();
+                    if (currentFilter === '태양열 패널') {
+                        filterMatch = content.includes('태양열') || content.includes('태양광');
+                    } else if (currentFilter === '부품') {
+                        filterMatch = content.includes('부품') || content.includes('장비') || content.includes('장치') || content.includes('센서') || content.includes('배관');
+                    } else {
+                        filterMatch = content.includes(currentFilter.toLowerCase());
+                    }
+                }
+                return searchMatch && filterMatch;
+            });
+            
+            if (filtered.length === 0) {
+                grid.innerHTML = '<div class="col-span-full py-32 text-center text-slate-400 font-bold text-xl"><i class="fa-solid fa-solar-panel mb-4 text-4xl block opacity-20"></i> 검색된 기업이 없습니다.</div>';
+                return;
+            }
+            
+            filtered.forEach(b => {
+                const card = document.createElement('div');
+                card.className = "group bg-white rounded-[2rem] border border-slate-200 shadow-sm hover:shadow-2xl hover:border-brand-200 hover:-translate-y-2 transition-all duration-300 cursor-pointer overflow-hidden flex flex-col h-full";
+                card.onclick = () => openModal(b);
+                
+                const countryTag = b.country ? `<span class="${b.country.length >= 13 ? 'text-[9px] px-2.5' : 'text-[10px] px-3'} py-1.5 font-black uppercase tracking-widest text-slate-400 bg-slate-100 rounded-full inline-flex items-center w-fit"><i class="fa-solid fa-location-dot text-brand-500 mr-1.5"></i>${b.country}</span>` : '';
+
+                card.innerHTML = `
+                    <div class="h-2 energy-gradient"></div>
+                    <div class="p-8 flex-grow flex flex-col">
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="w-10 h-10 rounded-xl bg-brand-50 flex items-center justify-center text-brand-600 shadow-sm border border-brand-100/50 shrink-0">
+                                <i class="fa-solid ${b.icon || 'fa-industry'} text-lg"></i>
+                            </div>
+                            <span class="text-xs font-black text-slate-600 tracking-tight leading-tight">${b.type}</span>
+                        </div>
+                        <h3 class="text-xl font-black mb-4 group-hover:text-brand-600 transition-colors leading-tight tracking-tighter">${b.name}</h3>
+                        <p class="text-sm text-slate-500 line-clamp-3 leading-relaxed font-medium mb-5">${b.desc}</p>
+                        
+                        <div class="mt-auto">
+                            ${countryTag}
+                        </div>
+                    </div>
+                    <div class="px-8 pb-8 pt-4 flex items-center justify-between text-slate-300 border-t border-slate-50 group-hover:text-brand-500 transition-all">
+                        <span class="text-xs font-black uppercase tracking-widest flex items-center gap-2">Detail View</span>
+                        <div class="bg-slate-50 p-2 rounded-full group-hover:bg-brand-50 transition-colors"><i class="fa-solid fa-arrow-right text-xs"></i></div>
+                    </div>`;
+                grid.appendChild(card);
+            });
+        }
+
+        function openModal(buyer) {
+            selectedBuyer = buyer;
+            const modal = document.getElementById('modal');
+            const header = document.getElementById('modalHeader');
+            const body = document.getElementById('modalBody');
+            
+            const countryCode = getCountryCode(buyer.country);
+            const flagHtml = countryCode ? `<img src="https://flagcdn.com/w160/${countryCode}.png" alt="${buyer.country} flag" class="h-10 sm:h-14 w-auto rounded shadow-sm border border-slate-200 object-contain">` : '';
+
+            header.innerHTML = `
+                <div class="flex justify-between items-start w-full">
+                    <div class="flex flex-col">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="px-3 py-1 rounded-full text-[10px] font-black text-white uppercase tracking-widest energy-gradient">해외 바이어</span>
+                            ${buyer.country ? `<span class="text-sm font-black text-slate-400 ml-1">/ ${buyer.country}</span>` : ''}
+                            <span class="px-2.5 py-1 rounded-md text-[10px] font-black tracking-tight ${buyer.koreaHistory === '한국과 거래 이력 있음' ? 'bg-blue-50 text-blue-600 border border-blue-200' : 'bg-slate-50 text-slate-400 border border-slate-200'} ml-2">
+                                ${buyer.koreaHistory === '한국과 거래 이력 있음' ? '<i class="fa-solid fa-handshake"></i> ' : ''}${buyer.koreaHistory}
+                            </span>
+                        </div>
+                        <h2 class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tighter leading-tight">${buyer.name}</h2>
+                    </div>
+                    ${countryCode ? `<div class="ml-4 hidden sm:block">${flagHtml}</div>` : ''}
+                </div>
+                ${countryCode ? `<div class="mt-4 sm:hidden">${flagHtml}</div>` : ''}
+            `;
+            
+            const itemsHtml = buyer.items ? buyer.items.split(',').map(i => `<span class="px-5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 hover:border-brand-500 hover:text-brand-700 transition-all shadow-sm"><i class="fa-solid fa-check text-brand-400 mr-1"></i> ${i.trim()}</span>`).join('') : '';
+
+            body.innerHTML = `
+                <div class="space-y-12">
+                    <section>
+                        <h4 class="text-base sm:text-lg font-black text-slate-700 mb-6 tracking-tight flex items-center gap-2"><i class="fa-solid fa-building text-brand-500"></i> 기업 심층 분석</h4>
+                        <div class="bg-slate-50 p-8 rounded-[2rem] border border-slate-100 shadow-inner">
+                            <p class="text-slate-700 text-lg leading-relaxed font-medium">"${buyer.desc}"</p>
+                            
+                            <div class="grid grid-cols-2 lg:grid-cols-4 gap-6 text-xs font-black text-slate-500 border-t border-slate-200 pt-8 mt-8">
+                                <div class="space-y-2">
+                                    <p class="text-[10px] text-slate-400 uppercase tracking-widest"><i class="fa-regular fa-calendar mr-1"></i> 설립 연도</p>
+                                    <p class="text-sm text-slate-800">${buyer.established || '정보 없음'}</p>
+                                </div>
+                                <div class="space-y-2">
+                                    <p class="text-[10px] text-slate-400 uppercase tracking-widest"><i class="fa-solid fa-users mr-1"></i> 직원 수</p>
+                                    <p class="text-sm text-slate-800">${buyer.employees || '정보 없음'}</p>
+                                </div>
+                                <div class="space-y-2">
+                                    <p class="text-[10px] text-slate-400 uppercase tracking-widest"><i class="fa-solid fa-chart-line mr-1"></i> 연매출</p>
+                                    <p class="text-sm text-slate-800 break-words leading-tight pr-4">${buyer.revenue || '정보 없음'}</p>
+                                </div>
+                                <div class="space-y-2">
+                                    <p class="text-[10px] text-slate-400 uppercase tracking-widest"><i class="fa-solid fa-link mr-1"></i> 웹사이트</p>
+                                    ${buyer.website && buyer.website !== '없음' ? `<a href="${buyer.website.startsWith('http') ? buyer.website : 'https://' + buyer.website}" target="_blank" class="text-sm text-brand-600 hover:underline flex items-center gap-1.5 font-bold"><i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i> 홈페이지</a>` : `<span class="text-sm">정보 없음</span>`}
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section>
+                        <h4 class="text-base sm:text-lg font-black text-slate-700 mb-6 tracking-tight flex items-center gap-2"><i class="fa-solid fa-plug-circle-plus text-brand-500"></i> 도입 희망 및 관심 기술</h4>
+                        <div class="flex flex-wrap gap-2.5">${itemsHtml}</div>
+                    </section>
+
+                    <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="p-8 border-2 border-slate-100 rounded-[2rem] bg-white shadow-sm flex flex-col justify-center">
+                            <h4 class="text-sm font-black text-slate-500 mb-2 tracking-tight">미팅 담당자</h4>
+                            <p class="font-black text-2xl text-slate-900 tracking-tight">${buyer.manager || '담당자 배정 중'}</p>
+                            ${buyer.date ? `<div class="mt-4 inline-flex items-center gap-2 text-xs font-bold bg-brand-50 text-brand-700 px-3 py-1.5 rounded-lg w-fit"><i class="fa-regular fa-calendar-check"></i> ${buyer.date}</div>` : ''}
+                        </div>
+                        <div class="p-8 bg-slate-900 text-white rounded-[2rem] shadow-xl relative overflow-hidden flex flex-col justify-center">
+                            <div class="absolute top-1/2 -translate-y-1/2 right-6 opacity-10"><i class="fa-solid fa-leaf text-8xl"></i></div>
+                            <h4 class="text-sm font-black opacity-60 mb-2 tracking-tight">목표 성과</h4>
+                            <p class="font-black text-2xl text-brand-400">Green Tech Matching</p>
+                            <p class="text-xs opacity-70 mt-2 font-medium">탄소 중립 및 신재생 기술 도입</p>
+                        </div>
+                    </section>
+
+                    <section class="energy-gradient p-10 rounded-[2.5rem] text-white shadow-xl relative overflow-hidden">
+                        <div class="absolute top-0 right-0 p-8 opacity-10"><i class="fa-solid fa-rocket text-8xl"></i></div>
+                        <h4 class="text-base sm:text-lg font-black text-brand-100 mb-5 tracking-tight flex items-center gap-2"><i class="fa-solid fa-bullseye"></i> 핵심 소싱 및 파트너십 전략</h4>
+                        <p class="text-xl sm:text-2xl font-black leading-snug tracking-tighter opacity-95">${buyer.strategy || '최적의 파트너십 구축 및 기술 도입 검토'}</p>
+                    </section>
+
+                    <div class="pt-6 flex flex-col sm:flex-row gap-4 border-t border-slate-100">
+                        <button onclick="showApplyForm()" class="flex-1 bg-slate-900 text-white py-5 rounded-2xl font-black text-lg hover:bg-black transition-all shadow-xl active:scale-[0.98] border border-slate-800">1:1 비즈니스 미팅 신청</button>
+                        <button onclick="closeModal()" class="px-10 py-5 rounded-2xl font-black text-slate-500 bg-slate-50 hover:bg-slate-100 transition-all text-lg border border-slate-200">닫기</button>
+                    </div>
+                </div>`;
+            modal.classList.remove('hidden');
+            document.body.classList.add('modal-open');
+        }
+
+        function showApplyForm() {
+            const body = document.getElementById('modalBody');
+
+            body.innerHTML = `
+                <div class="animate-in slide-in-from-right-8 duration-500">
+                    <div class="flex items-center gap-3 mb-8">
+                        <div class="w-2 h-8 energy-gradient rounded-full"></div>
+                        <h3 class="text-2xl font-black text-slate-900 tracking-tighter">B2B 미팅 신청서 작성</h3>
+                    </div>
+                    <form onsubmit="handleApply(event)" id="matchingForm" class="space-y-8 bg-slate-50 p-8 rounded-[2rem] border border-slate-100">
+                        <div class="flex flex-col sm:flex-row gap-6 bg-white p-6 rounded-xl border border-brand-100">
+                            <div class="space-y-1 flex-1">
+                                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest"><i class="fa-solid fa-building mr-1"></i> 신청 기업</label>
+                                <div class="text-lg font-black text-slate-800">${loggedInCompany}</div>
+                            </div>
+                            <div class="space-y-1 flex-1 sm:border-l sm:border-slate-100 sm:pl-6">
+                                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest"><i class="fa-solid fa-user-tie mr-1"></i> 담당자</label>
+                                <div class="text-lg font-black text-slate-800">${loggedInManager}</div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-3">
+                            <label class="block text-xs font-black text-slate-500 uppercase tracking-widest ml-1"><i class="fa-solid fa-clock mr-1"></i> 희망 상담 시간 선택</label>
+                            <select id="inputTime" required class="w-full px-5 py-4 rounded-xl border border-slate-200 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all font-bold text-base bg-white shadow-sm appearance-none cursor-pointer">
+                                <option value="" disabled selected>원하시는 타임을 선택해 주세요</option>
+                                <option value="7/08(수) 오전">7/08(수) 오전 (10:00 - 12:00)</option>
+                                <option value="7/08(수) 오후">7/08(수) 오후 (13:00 - 17:00)</option>
+                                <option value="부스 방문 요청" class="text-brand-600 font-black">📍 부스 방문 요청</option>
+                                <option value="매칭 취소 요청" class="text-red-600 font-black">⚠️ 기존 매칭 취소 요청</option>
+                            </select>
+                        </div>
+                        <div class="flex flex-col sm:flex-row gap-4 pt-4">
+                            <button type="submit" id="submitBtn" class="flex-1 energy-gradient text-white py-5 rounded-xl font-black text-lg shadow-lg hover:shadow-brand-500/30 transition-all active:scale-95 flex items-center justify-center gap-2"><i class="fa-solid fa-paper-plane"></i> 원클릭 신청 완료</button>
+                            <button type="button" onclick="closeModal()" class="px-8 py-5 rounded-xl font-black text-slate-500 border border-slate-200 hover:bg-slate-200 transition-all text-lg bg-white">작성 취소</button>
+                        </div>
+                    </form>
+                </div>`;
+        }
+
+        async function handleApply(e) {
+            e.preventDefault();
+            const submitBtn = document.getElementById('submitBtn');
+            const time = document.getElementById('inputTime').value;
+            
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fa-solid fa-spinner spinner text-xl"></i><span> 서버 전송 중...</span>';
+
+            const payload = {
+                timestamp: new Date().toLocaleString('ko-KR'),
+                buyerName: selectedBuyer.name,
+                company: loggedInCompany,
+                password: loggedInManager,
+                time: time,
+                category: '해외'
+            };
+
+            try {
+                await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                showToast('미팅 요청이 기록되었습니다. [내 내역 확인]에서 확인하세요.', 'success');
+                closeModal();
+            } catch (err) {
+                showToast('네트워크 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.', 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> 원클릭 신청 완료';
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.add('hidden');
+            document.body.classList.remove('modal-open');
+        }
+    </script>
+</body>
+</html>
