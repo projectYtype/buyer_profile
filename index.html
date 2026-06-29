@@ -855,13 +855,13 @@
 
             let tbodyHTML = '';
             (config.dates||[]).forEach((dateStr, dayIdx) => {
-                tbodyHTML += `<tr class="day-header"><td colspan="4">📅 ${dayIdx + 1}일 차 (${dateStr})</td></tr>`;
+                tbodyHTML += `<tr class="day-header"><td colspan="3">📅 ${dayIdx + 1}일 차 (${dateStr})</td></tr>`;
                 
                 let lastEndTime = null;
                 timeSlots.forEach(slot => {
                     const [start, end] = slot.value.split('~');
                     if (lastEndTime && lastEndTime === config.lunchStart && start === config.lunchEnd) {
-                        tbodyHTML += `<tr class="lunch-row"><td colspan="4">☕ 점심 및 휴식 시간 (${config.lunchStart} ~ ${config.lunchEnd})</td></tr>`;
+                        tbodyHTML += `<tr class="lunch-row"><td colspan="3">☕ 점심 및 휴식 시간 (${config.lunchStart} ~ ${config.lunchEnd})</td></tr>`;
                     }
                     lastEndTime = end;
 
@@ -875,7 +875,6 @@
 
                     tbodyHTML += `
                     <tr class="${isBooked ? '' : 'dimmed-row'}">
-                        <td style="font-weight:700; color:#475569; min-width:90px;">${dateStr}</td>
                         <td style="font-weight:900; color:#059669; min-width:110px;">${slot.value}</td>
                         <td class="${isBooked ? '' : 'dimmed'}" style="text-align:left; padding-left:15px; min-width:240px;">${mainText}</td>
                         <td style="min-width:80px;">${subText}</td>
@@ -884,7 +883,7 @@
             });
 
             const title = `[기업] ${company.name} 매칭 스케줄`;
-            const theadHTML = `<tr><th>날짜</th><th>시간</th><th style="text-align:left; padding-left:15px;">매칭 바이어 소속 및 이름</th><th>테이블</th></tr>`;
+            const theadHTML = `<tr><th>시간</th><th style="text-align:left; padding-left:15px;">매칭 바이어 소속 및 이름</th><th>테이블</th></tr>`;
 
             const htmlContent = `
                 <!DOCTYPE html>
@@ -904,7 +903,6 @@
                         .btn-print { background: linear-gradient(135deg, #059669 0%, #0d9488 100%); color: white; border: none; padding: 14px 28px; border-radius: 14px; font-weight: 800; font-size: 15px; cursor: pointer; box-shadow: 0 10px 15px -3px rgba(5, 150, 105, 0.2); transition: all 0.2s; display: flex; align-items: center; gap: 8px; outline: none; white-space: nowrap; }
                         .btn-print:hover { transform: translateY(-3px); box-shadow: 0 15px 20px -5px rgba(5, 150, 105, 0.3); }
                         
-                        /* 모바일 가로 튕김 방지 스크롤 컨테이너 */
                         .table-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; border: 1px solid #e2e8f0; border-radius: 16px; }
                         table { width: 100%; border-collapse: separate; border-spacing: 0; text-align: center; font-size: 15px; overflow: hidden; }
                         th, td { border-bottom: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; padding: 18px 12px; white-space: nowrap; }
@@ -915,18 +913,16 @@
                         tbody tr:hover { background-color: #f1f5f9; }
                         .day-header td { background-color: #ecfdf5 !important; color: #064e3b; font-weight: 900; text-align: left; padding-left: 28px; font-size: 16px; border-top: 3px solid #34d399; letter-spacing: -0.5px; }
                         
-                        /* 조정된 텍스트 클래스들 */
                         .highlight { font-weight: 800; color: #0f172a; font-size: 14px; letter-spacing: -0.3px; }
                         .buyer-name { font-size: 12px; color: #64748b; font-weight: 500; margin-left: 2px; }
                         .empty-text { font-size: 14px; color: #94a3b8; }
-                        .lunch-row td { background-color: #fff7ed !important; color: #ea580c; font-weight: 700; border-top: 1px dashed #fdba74; border-bottom: 1px dashed #fdba74; font-size: 13px; text-align: center !important; }
+                        .lunch-row td { background-color: #fff7ed !important; color: #ea580c; font-weight: 700; border-top: 1px dashed #fdba74; border-bottom: 1px dashed #fdba74; font-size: 10px; text-align: center !important; }
                         
                         .dimmed { color: #cbd5e1; font-weight: 600; }
                         .dimmed-row { background-color: #fafafa; }
                         .badge { display: inline-block; background: #f1f5f9; color: #94a3b8; padding: 6px 14px; border-radius: 10px; font-weight: 800; font-size: 14px; min-width: 30px; text-align: center; }
                         .badge.active { background: #059669; color: white; box-shadow: 0 4px 6px -1px rgba(5, 150, 105, 0.2); }
                         
-                        /* 📱 팝업창 전용 모바일 반응형 미디어 쿼리 */
                         @media (max-width: 640px) {
                             body { padding: 16px 10px; }
                             .container { padding: 20px 14px; border-radius: 20px; }
@@ -937,11 +933,10 @@
                             th, td { padding: 12px 10px; font-size: 13px; }
                             .day-header td { font-size: 14px; padding-left: 16px; }
                             
-                            /* 모바일 폰트 사이즈 추가 조정 */
                             .highlight { font-size: 13px; }
                             .buyer-name { font-size: 11px; }
                             .empty-text { font-size: 12px; }
-                            .lunch-row td { font-size: 11px; }
+                            .lunch-row td { font-size: 9px; }
                             
                             .badge { padding: 4px 10px; font-size: 12px; }
                         }
