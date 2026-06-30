@@ -597,14 +597,21 @@
                 
                 const countryTag = b.country ? `<span class="${b.country.length >= 13 ? 'text-[9px] px-2.5' : 'text-[10px] px-3'} py-1.5 font-black uppercase tracking-widest text-slate-400 bg-slate-100 rounded-full inline-flex items-center w-fit"><i class="fa-solid fa-location-dot text-brand-500 mr-1.5"></i>${b.country}</span>` : '';
 
+                // 국기 이미지 처리
+                const countryCode = getCountryCode(b.country);
+                const flagHtml = countryCode ? `<img src="https://flagcdn.com/w40/${countryCode}.png" alt="${b.country} flag" class="w-6 sm:w-8 h-auto rounded shadow-sm border border-slate-200 object-contain ml-2 shrink-0">` : '';
+
                 card.innerHTML = `
                     <div class="h-2 energy-gradient"></div>
                     <div class="p-5 sm:p-8 flex-grow flex flex-col">
-                        <div class="flex items-center gap-3 mb-4 sm:mb-6">
-                            <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-brand-50 flex items-center justify-center text-brand-600 shadow-sm border border-brand-100/50 shrink-0">
-                                <i class="fa-solid ${b.icon || 'fa-industry'} text-base sm:text-lg"></i>
+                        <div class="flex justify-between items-start mb-4 sm:mb-6">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-brand-50 flex items-center justify-center text-brand-600 shadow-sm border border-brand-100/50 shrink-0">
+                                    <i class="fa-solid ${b.icon || 'fa-industry'} text-base sm:text-lg"></i>
+                                </div>
+                                <span class="text-[11px] sm:text-xs font-black text-slate-600 tracking-tight leading-tight">${b.type}</span>
                             </div>
-                            <span class="text-[11px] sm:text-xs font-black text-slate-600 tracking-tight leading-tight">${b.type}</span>
+                            ${flagHtml}
                         </div>
                         <h3 class="text-lg sm:text-xl font-black mb-3 sm:mb-4 group-hover:text-brand-600 transition-colors leading-tight tracking-tighter">${b.name}</h3>
                         <p class="text-xs sm:text-sm text-slate-500 line-clamp-3 leading-relaxed font-medium mb-4 sm:mb-5">${b.desc}</p>
